@@ -1,0 +1,15 @@
+services:
+  live:
+    build: .
+    restart: unless-stopped
+    environment:
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - PLATFORM_URL=${PLATFORM_URL:-https://codexsoto.com}
+      - PRIVACY_URL=${PRIVACY_URL:-}
+      - EVENT_NAME=${EVENT_NAME:-Agentes de IA 2026}
+    volumes:
+      - live-data:/app/data
+    expose:
+      - "3000"
+volumes:
+  live-data:

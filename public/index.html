@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#03060b">
+<title>CodexSoto Live</title>
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Rajdhani:wght@600;700&family=Chakra+Petch:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#03060b;--panel:#0a1422;--ink:#e6f2ff;--mute:#8aa0bb;--dim:#4d6079;--cyan:#26e0ff;--green:#36ff8f;--red:#ff3d57;--blue:#3f82ff;--amber:#ffc65c;--line:rgba(110,170,240,.18);--line2:rgba(110,170,240,.34);
+--fd:"Orbitron",system-ui,sans-serif;--fl:"Rajdhani","Arial Narrow",sans-serif;--fb:"Chakra Petch","Segoe UI",system-ui,sans-serif;--fm:"JetBrains Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(ellipse 90% 50% at 80% 0%,rgba(25,70,130,.28),transparent 70%) fixed,var(--bg);min-height:100vh}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+header img{height:18px;width:auto;display:block}
+.live{font-family:var(--fm);font-size:12px;color:var(--mute);display:flex;align-items:center;gap:7px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.live.on i{background:var(--green);box-shadow:0 0 10px var(--green)}
+.eyebrow{font-family:var(--fl);font-weight:700;font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);margin:0 0 8px}
+h1{font-family:var(--fd);font-weight:900;font-size:28px;line-height:1.1;margin:0 0 10px;text-wrap:balance}
+h2{font-family:var(--fd);font-weight:800;font-size:21px;line-height:1.2;margin:0 0 8px;text-wrap:balance}
+p{line-height:1.5;margin:0}
+.mu{color:var(--mute)} .cy{color:var(--cyan)}
+.card{background:linear-gradient(180deg,rgba(13,26,43,.92),rgba(8,17,29,.92));border:1px solid var(--line);border-radius:6px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.pills{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.pillbtn{border:1px solid var(--line2);background:rgba(3,10,18,.7);border-radius:8px;padding:20px 10px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer}
+.pill{width:96px;height:38px;border-radius:19px;transform:rotate(-18deg)}
+.pill.red{background:radial-gradient(ellipse 22% 26% at 30% 30%,rgba(255,255,255,.85),transparent 70%),linear-gradient(140deg,#ff7d8c,#d10024 55%,#5e000f);box-shadow:0 0 30px rgba(255,61,87,.45)}
+.pill.blue{background:radial-gradient(ellipse 22% 26% at 30% 30%,rgba(255,255,255,.85),transparent 70%),linear-gradient(140deg,#8fb6ff,#1d4fd8 55%,#08205e);box-shadow:0 0 30px rgba(63,130,255,.45)}
+.pillbtn b{font-family:var(--fl);font-size:17px;letter-spacing:.12em;text-transform:uppercase}
+.pillbtn.sel{border-color:var(--cyan);background:rgba(38,224,255,.1)}
+.opt{width:100%;text-align:left;border:1px solid var(--line2);background:rgba(3,10,18,.7);border-radius:6px;padding:14px 16px;font-family:var(--fm);font-size:16px;cursor:pointer}
+.opt.sel{border-color:var(--cyan);background:rgba(38,224,255,.12);color:#fff}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.bar{display:grid;grid-template-columns:96px 1fr 48px;gap:10px;align-items:center;font-family:var(--fm);font-size:14px}
+.bar .t{height:16px;background:rgba(110,170,240,.1);border-radius:2px;overflow:hidden}
+.bar .t i{display:block;height:100%;width:0;background:var(--cyan);transition:width .5s}
+.bar .n{text-align:right;color:var(--mute);font-variant-numeric:tabular-nums}
+.bar.me span:first-child{color:var(--cyan)}
+blockquote{margin:0;font-style:italic;line-height:1.5;color:#d8e6f5;white-space:pre-line}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.two button{border:1px solid var(--line2);background:rgba(3,10,18,.7);border-radius:5px;padding:11px;font-family:var(--fl);font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.two button.sel{border-color:var(--cyan);color:var(--cyan);background:rgba(38,224,255,.1)}
+.res{margin-top:12px;font-family:var(--fm);font-size:13px;color:var(--mute)}
+.res b.h{color:var(--green)} .res b.ai{color:var(--red)}
+.tag{display:inline-block;font-family:var(--fl);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:2px 8px;border:1px solid currentColor;border-radius:2px}
+label{display:block;font-family:var(--fl);font-weight:600;font-size:14px;letter-spacing:.06em;color:var(--mute);margin:0 0 6px}
+.inp{width:100%;background:rgba(2,8,14,.85);border:1px solid var(--line2);border-radius:5px;padding:12px 14px;font-size:16px}
+.inp:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(38,224,255,.15)}
+textarea.inp{resize:vertical;min-height:84px}
+.btn{width:100%;border:0;border-radius:5px;padding:14px;background:var(--cyan);color:#00131b;font-family:var(--fl);font-weight:700;font-size:17px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.alt{background:transparent;color:var(--cyan);border:1px solid var(--cyan)}
+a.btn{display:block;text-align:center;text-decoration:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1px solid var(--line2);background:transparent;border-radius:16px;padding:7px 12px;font-size:14px;cursor:pointer}
+.chips button[aria-pressed="true"]{border-color:var(--cyan);background:rgba(38,224,255,.14);color:#fff}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--mute)}
+.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--cyan);flex:none}
+.check a{color:var(--cyan)}
+.err{color:#ff9aa8;font-size:14px;min-height:20px}
+.q{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:5px;background:rgba(3,10,18,.6)}
+.q p{font-size:15px;overflow-wrap:anywhere}
+.q .up{border:1px solid var(--line2);background:transparent;border-radius:5px;padding:6px 10px;font-family:var(--fm);font-size:14px;cursor:pointer;min-width:56px}
+.q .up.on{border-color:var(--cyan);color:var(--cyan)}
+.q.done{opacity:.55}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(3,6,11,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:0 max(8px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px,env(safe-area-inset-left));z-index:10}
+nav button{background:none;border:0;padding:14px 4px 13px;font-family:var(--fl);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);cursor:pointer;position:relative}
+nav button[aria-selected="true"]{color:var(--cyan)}
+nav button[aria-selected="true"]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--cyan)}
+nav button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:6px;vertical-align:2px}
+.big{font-family:var(--fd);font-weight:900;font-size:44px;color:var(--cyan)}
+.wait{display:flex;align-items:center;gap:10px;font-family:var(--fm);font-size:13px;color:var(--mute)}
+.wait i{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:p 1.4s infinite}
+.wait i:nth-child(2){animation-delay:.2s}.wait i:nth-child(3){animation-delay:.4s}
+@keyframes p{0%,100%{opacity:.2}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="/logo.png" alt="CodexSoto"><span class="live" id="live"><i></i><span id="liveTxt">conectando…</span></span></header>
+  <main id="view-live" class="stack"></main>
+  <main id="view-q" class="stack" hidden>
+    <div><p class="eyebrow">Preguntas</p><h1>Pregúntale a David</h1><p class="mu">Escribe tu pregunta o vota las de otros. Las más votadas se responden al final.</p></div>
+    <form class="card stack" id="qForm">
+      <div><label for="qText">Tu pregunta</label><textarea class="inp" id="qText" maxlength="240" placeholder="¿Cómo empiezo a construir mi primer agente?"></textarea></div>
+      <div class="err" id="qErr" role="alert"></div>
+      <button class="btn" type="submit" id="qBtn">Enviar pregunta</button>
+    </form>
+    <div class="stack" id="qList"></div>
+  </main>
+  <main id="view-r" class="stack" hidden>
+    <div><p class="eyebrow">Únete a CodexSoto</p><h1>Regístrate y accede a la plataforma</h1><p class="mu">Recibe los materiales de la conferencia, cursos y próximos talleres de IA.</p></div>
+    <form class="card stack" id="rForm" novalidate>
+      <div><label for="rName">Nombre completo</label><input class="inp" id="rName" autocomplete="name" maxlength="100" required></div>
+      <div><label for="rEmail">Correo electrónico</label><input class="inp" id="rEmail" type="email" autocomplete="email" inputmode="email" maxlength="160" required></div>
+      <div><label for="rPhone">Teléfono (opcional)</label><input class="inp" id="rPhone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20"></div>
+      <div><label for="rInst">Institución o empresa</label><input class="inp" id="rInst" maxlength="120" value="Instituto Tecnológico de Aguascalientes"></div>
+      <div><label for="rCareer">Carrera y semestre, o puesto</label><input class="inp" id="rCareer" maxlength="120" placeholder="Ing. en Sistemas, 7.º semestre"></div>
+      <div><label>¿Qué te interesa?</label><div class="chips" id="rInt"></div></div>
+      <label class="check"><input type="checkbox" id="rConsent"><span id="rConsentTxt">Acepto el aviso de privacidad y el uso de mis datos para contactarme sobre CodexSoto.</span></label>
+      <label class="check"><input type="checkbox" id="rNews" checked><span>Quiero recibir noticias de cursos y talleres.</span></label>
+      <div class="err" id="rErr" role="alert"></div>
+      <button class="btn" type="submit" id="rBtn">Registrarme</button>
+    </form>
+  </main>
+</div>
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-tab="live">En vivo</button>
+  <button role="tab" aria-selected="false" data-tab="q">Preguntas</button>
+  <button role="tab" aria-selected="false" data-tab="r">Registro</button>
+</nav>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const rid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,12));
+let cid=store.get('cx_cid',null);if(!cid||!/^[A-Za-z0-9-]{8,64}$/.test(cid)){cid=rid();store.set('cx_cid',cid)}
+const mine=store.get('cx_votes',{});const myQ=store.get('cx_qvotes',{});
+let S=null,lastAct=null,tab='live';
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function api(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'No se pudo enviar. Revisa tu conexión.');return j}
+
+/* Pestañas */
+function setTab(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  $('#view-live').hidden=t!=='live';$('#view-q').hidden=t!=='q';$('#view-r').hidden=t!=='r';if(t==='q')renderQ();window.scrollTo(0,0);markDots()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function markDots(){document.querySelectorAll('nav .dot').forEach(d=>d.remove());if(!S)return;
+  const want=S.activity==='questions'?'q':S.activity==='register'?'r':(['pills','real','next'].includes(S.activity)?'live':null);
+  if(want&&want!==tab){const b=document.querySelector('nav [data-tab="'+want+'"]');const d=document.createElement('span');d.className='dot';b.appendChild(d)}}
+
+/* Vista en vivo */
+const REAL=[['A','En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor.','h','Miguel de Cervantes, 1605'],
+ ['B','En una ciudad del Bajío, cuyo nombre bien recuerdo, vivía no ha mucho un ingeniero de los de laptop en mochila, café frío, código viejo y servidor caído.','ai','Un LLM imitando a Cervantes'],
+ ['C','Volverán los mensajes sin respuesta\na tu pantalla su luz a encender,\ny otra vez con el dedo en el cristal\ndudando escribirás.','ai','Un LLM imitando a Bécquer'],
+ ['D','Volverán las oscuras golondrinas\nen tu balcón sus nidos a colgar,\ny otra vez con el ala a sus cristales\njugando llamarán.','h','Gustavo Adolfo Bécquer, 1871']];
+const NEXT=['cambiar','transformar','ayudar','automatizar','reemplazar','bailar'];
+function bars(c,labels,me){const tot=Object.values(c).reduce((a,b)=>a+b,0)||0;return '<div class="bars">'+Object.keys(c).map(k=>{const p=tot?Math.round(c[k]/tot*100):0;return '<div class="bar'+(k===me?' me':'')+'"><span>'+esc(labels[k]||k)+'</span><div class="t"><i style="width:'+p+'%"></i></div><span class="n">'+p+'%</span></div>'}).join('')+'</div><p class="res">'+tot+' votos</p>'}
+async function vote(poll,option){mine[poll]=option;store.set('cx_votes',mine);renderLive();try{await api('/api/vote',{cid,poll,option})}catch(e){toast(e.message)}}
+function renderLive(){const v=$('#view-live');if(!S){v.innerHTML='<div class="card"><div class="wait"><i></i><i></i><i></i> Conectando con la conferencia…</div></div>';return}
+  const a=S.activity;let h='';
+  if(a==='pills'){h='<div><p class="eyebrow">Dinámica 1</p><h1>¿Azul o roja?</h1><p class="mu">Azul: la IA es magia y no preguntas cómo funciona. Roja: vemos qué pasa por dentro.</p></div><div class="card"><div class="pills">'+
+    [['blue','Azul'],['red','Roja']].map(([k,l])=>'<button class="pillbtn'+(mine.pills===k?' sel':'')+'" data-v="pills:'+k+'"><span class="pill '+k+'"></span><b>'+l+'</b></button>').join('')+'</div>'+(mine.pills?'<div style="margin-top:16px">'+bars(S.counts.pills,{blue:'Azul',red:'Roja'},mine.pills)+'</div>':'')+'</div>'}
+  else if(a==='real'){h='<div><p class="eyebrow">Dinámica 2</p><h1>¿Humano o máquina?</h1><p class="mu">Vota cada texto. La respuesta aparece cuando David la revele.</p></div>'+REAL.map(([L,t,ans,src])=>{const p='real'+L,rev=S.reveal[p],c=S.counts[p],tot=c.h+c.ai;
+      return '<div class="card"><p class="eyebrow">Texto '+L+'</p><blockquote>'+esc(t)+'</blockquote>'+(rev?'<p class="res">Respuesta: <b class="'+ans+'">'+(ans==='h'?'HUMANO':'IA')+'</b> · '+esc(src)+'<br>El público: '+(tot?Math.round(c.h/tot*100):0)+'% humano · '+(tot?Math.round(c.ai/tot*100):0)+'% IA'+(mine[p]?(mine[p]===ans?' · <span class="cy">acertaste</span>':' · fallaste'):'')+'</p>':
+        '<div class="two"><button class="'+(mine[p]==='h'?'sel':'')+'" data-v="'+p+':h">Humano</button><button class="'+(mine[p]==='ai'?'sel':'')+'" data-v="'+p+':ai">IA</button></div>')+'</div>'}).join('')}
+  else if(a==='next'){h='<div><p class="eyebrow">Dinámica 3</p><h1>Sé el modelo de lenguaje</h1><p class="mu">¿Qué palabra sigue?</p></div><div class="card stack"><p style="font-family:var(--fm);font-size:18px">Los agentes de IA van a <span class="cy">___</span></p>'+
+    NEXT.map(w=>'<button class="opt'+(mine.next===w?' sel':'')+'" data-v="next:'+w+'">'+w+'</button>').join('')+(mine.next?bars(S.counts.next,{},mine.next):'')+'</div>'}
+  else if(a==='questions'){h='<div class="card stack"><p class="eyebrow">Ronda de preguntas</p><h2>Es momento de preguntar</h2><button class="btn" data-go="q">Ir a preguntas</button></div>'}
+  else if(a==='register'){h='<div class="card stack"><p class="eyebrow">Gracias por venir</p><h2>Regístrate y accede a CodexSoto</h2><p class="mu">Recibe los materiales de la conferencia.</p><button class="btn" data-go="r">Registrarme</button></div>'}
+  else{h='<div><p class="eyebrow">'+esc(S.event)+'</p><h1>Bienvenido</h1><p class="mu">Deja esta página abierta. Aquí aparecerán las votaciones conforme avance la conferencia.</p></div><div class="card"><div class="wait"><i></i><i></i><i></i> Esperando la siguiente dinámica</div></div><div class="card"><p class="eyebrow">Conectados ahora</p><div class="big">'+S.online+'</div></div>'}
+  v.innerHTML=h;
+  v.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const [p,o]=b.dataset.v.split(':');vote(p,o)});
+  v.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go))}
+
+/* Preguntas */
+function renderQ(){const L=$('#qList');if(!S){L.innerHTML='';return}
+  L.innerHTML=S.questions.length?S.questions.map(q=>'<div class="q'+(q.answered?' done':'')+'"><p>'+esc(q.text)+(q.answered?' <span class="tag cy">respondida</span>':'')+'</p><button class="up'+(myQ[q.id]?' on':'')+'" data-q="'+q.id+'" aria-label="Votar pregunta">▲ '+q.votes+'</button></div>').join(''):'<p class="mu">Aún no hay preguntas. ¡Sé el primero!</p>';
+  L.querySelectorAll('[data-q]').forEach(b=>b.onclick=async()=>{const id=b.dataset.q;try{const j=await api('/api/questions/'+id+'/vote',{cid});myQ[id]=j.voted;store.set('cx_qvotes',myQ)}catch(e){toast(e.message)}})}
+$('#qForm').onsubmit=async e=>{e.preventDefault();const t=$('#qText').value.trim();$('#qErr').textContent='';$('#qBtn').disabled=true;
+  try{await api('/api/questions',{cid,text:t});$('#qText').value='';toast('Pregunta enviada')}catch(err){$('#qErr').textContent=err.message}finally{$('#qBtn').disabled=false}};
+
+/* Registro */
+let interests=[];
+function renderReg(){const done=store.get('cx_reg',null);if(done&&S){$('#rForm').outerHTML='<div class="card stack" id="rForm"><p class="eyebrow">Registro completo</p><h2>¡Listo, '+esc(done.split(' ')[0])+'!</h2><p class="mu">Ya quedaste registrado. Entra a la plataforma de CodexSoto.</p><a class="btn" href="'+esc(S.platformUrl)+'" target="_blank" rel="noopener">Entrar a CodexSoto</a><button class="btn alt" type="button" id="rAgain">Registrar a otra persona</button></div>';
+    $('#rAgain').onclick=()=>{store.set('cx_reg',null);location.reload()};return}
+  if(!S||$('#rInt').dataset.ok)return;$('#rInt').dataset.ok=1;
+  $('#rInt').innerHTML=S.interests.map(i=>'<button type="button" aria-pressed="false">'+esc(i)+'</button>').join('');
+  $('#rInt').querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);const t=b.textContent;interests=on?[...interests,t]:interests.filter(x=>x!==t)});
+  if(S.privacyUrl)$('#rConsentTxt').innerHTML='Acepto el <a href="'+esc(S.privacyUrl)+'" target="_blank" rel="noopener">aviso de privacidad</a> y el uso de mis datos para contactarme sobre CodexSoto.'}
+$('#rForm').onsubmit=async e=>{e.preventDefault();$('#rErr').textContent='';$('#rBtn').disabled=true;
+  const body={name:$('#rName').value,email:$('#rEmail').value,phone:$('#rPhone').value,institution:$('#rInst').value,career:$('#rCareer').value,interests,consent:$('#rConsent').checked,news:$('#rNews').checked};
+  try{await api('/api/register',body);store.set('cx_reg',body.name.trim());renderReg()}catch(err){$('#rErr').textContent=err.message;$('#rBtn').disabled=false}};
+
+/* Aviso breve */
+let tT;function toast(m){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0d1a2b;border:1px solid var(--cyan);color:var(--ink);padding:10px 16px;border-radius:5px;font-size:14px;z-index:20;max-width:90vw';document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(tT);tT=setTimeout(()=>t.hidden=true,2600)}
+
+/* Conexión en tiempo real */
+function onState(s){S=s;$('#live').classList.add('on');$('#liveTxt').textContent='en vivo · '+s.online;
+  if(s.activity!==lastAct){const first=lastAct===null;lastAct=s.activity;if(!first){if(s.activity==='questions')setTab('q');else if(s.activity==='register')setTab('r');else if(['pills','real','next'].includes(s.activity))setTab('live')}}
+  renderLive();if(tab==='q')renderQ();renderReg();markDots()}
+function connect(){const es=new EventSource('/events');es.onmessage=e=>{try{onState(JSON.parse(e.data))}catch{}};
+  es.onerror=()=>{$('#live').classList.remove('on');$('#liveTxt').textContent='reconectando…'}}
+renderLive();connect();
+if(location.hash==='#registro')setTab('r');else if(location.hash==='#preguntas')setTab('q');
+})();
+</script>
+</body>
+</html>
