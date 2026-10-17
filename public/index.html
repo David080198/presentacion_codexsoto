@@ -77,6 +77,11 @@ nav button{background:none;border:0;padding:14px 4px 13px;font-family:var(--fl);
 nav button[aria-selected="true"]{color:var(--cyan)}
 nav button[aria-selected="true"]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--cyan)}
 nav button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:6px;vertical-align:2px}
+.nav-controls{position:fixed;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(3,6,11,.94);border-top:1px solid var(--line);z-index:9}
+.nav-controls.active{display:flex}
+.nav-controls button{background:rgba(38,224,255,.1);border:1px solid var(--cyan);color:var(--cyan);padding:8px 14px;border-radius:4px;font-family:var(--fm);font-size:13px;cursor:pointer;font-weight:600}
+.nav-controls button:hover{background:rgba(38,224,255,.2)}
+.nav-controls .slide-info{font-family:var(--fm);font-size:12px;color:var(--mute)}
 .big{font-family:var(--fd);font-weight:900;font-size:44px;color:var(--cyan)}
 .wait{display:flex;align-items:center;gap:10px;font-family:var(--fm);font-size:13px;color:var(--mute)}
 .wait i{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:p 1.4s infinite}
@@ -119,6 +124,11 @@ nav button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;back
   <button role="tab" aria-selected="false" data-tab="q">Preguntas</button>
   <button role="tab" aria-selected="false" data-tab="r">Registro</button>
 </nav>
+<div class="nav-controls" id="navControls">
+  <button id="prevBtn" type="button">◄ Anterior</button>
+  <span class="slide-info" id="slideInfo">Slide 1 / 46</span>
+  <button id="nextBtn" type="button">Siguiente ►</button>
+</div>
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
@@ -187,10 +197,20 @@ let tT;function toast(m){let t=$('#toast');if(!t){t=document.createElement('div'
 /* Conexión en tiempo real */
 function onState(s){S=s;$('#live').classList.add('on');$('#liveTxt').textContent='en vivo · '+s.online;
   if(s.activity!==lastAct){const first=lastAct===null;lastAct=s.activity;if(!first){if(s.activity==='questions')setTab('q');else if(s.activity==='register')setTab('r');else if(['pills','real','next'].includes(s.activity))setTab('live')}}
-  renderLive();if(tab==='q')renderQ();renderReg();markDots()}
+  renderLive();if(tab==='q')renderQ();renderReg();markDots();if(hasToken)updateSlideControls()}
 function connect(){const es=new EventSource('/events');es.onmessage=e=>{try{onState(JSON.parse(e.data))}catch{}};
   es.onerror=()=>{$('#live').classList.remove('on');$('#liveTxt').textContent='reconectando…'}}
-renderLive();connect();
+
+/* Control remoto de presentación (presentador con token) */
+const token=new URLSearchParams(location.search).get('token')||location.hash.slice(1).split('&').find(p=>p.startsWith('token='))?.split('=')[1];
+let hasToken=false;
+async function navigate(cmd,slide){if(!hasToken)return;try{await fetch('/api/navigate',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({command:cmd,slide})})}catch(e){toast(e.message)}}
+function updateSlideControls(){if(!hasToken||!S)return;$('#navControls').classList.add('active');$('#prevBtn').disabled=S.currentSlide<=0;$('#nextBtn').disabled=S.currentSlide>=45;$('#slideInfo').textContent='Slide '+(S.currentSlide+1)+' / 46'}
+if(token&&token.length>10){hasToken=true;$('#navControls').classList.add('active');$('#prevBtn').onclick=()=>navigate('prev');$('#nextBtn').onclick=()=>navigate('next')}
+
+renderLive();
+if(hasToken)updateSlideControls();
+connect();
 if(location.hash==='#registro')setTab('r');else if(location.hash==='#preguntas')setTab('q');
 })();
 </script>

@@ -28,7 +28,7 @@ const ACTIVITIES = ['lobby', 'pills', 'real', 'next', 'questions', 'register'];
 const INTERESTS = ['Agentes de IA', 'Desarrollo web', 'Ciencia de datos', 'Cursos y talleres', 'Proyectos para mi empresa'];
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [] };
+let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [], currentSlide: 0 };
 try { db = { ...db, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }; } catch { /* primer arranque */ }
 
 let saveTimer = null;
@@ -65,7 +65,7 @@ function publicState() {
   return {
     event: EVENT_NAME, activity: db.activity, counts: counts(), reveal: db.reveal,
     questions: visibleQuestions(), online: [...clients].filter((c) => c.role === 'aud').length,
-    platformUrl: PLATFORM_URL, privacyUrl: PRIVACY_URL, interests: INTERESTS,
+    platformUrl: PLATFORM_URL, privacyUrl: PRIVACY_URL, interests: INTERESTS, currentSlide: db.currentSlide,
   };
 }
 
@@ -223,6 +223,20 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
   if (scope === 'live') db.activity = 'lobby';
   save(); broadcast();
   res.json({ ok: true });
+});
+app.post('/api/navigate', requireAdmin, (req, res) => {
+  const { command, slide } = req.body || {};
+  const totalSlides = 46; // Actualiza esto si cambias el número de slides en deck.html
+  if (command === 'next' && db.currentSlide < totalSlides - 1) db.currentSlide++;
+  else if (command === 'prev' && db.currentSlide > 0) db.currentSlide--;
+  else if (command === 'goto' && typeof slide === 'number' && slide >= 0 && slide < totalSlides) db.currentSlide = slide;
+  else if (command === 'reset') db.currentSlide = 0;
+  else { return res.status(400).json({ error: 'Comando inválido.' }); }
+  save(); broadcast();
+  res.json({ ok: true, currentSlide: db.currentSlide });
+});
+app.get('/api/slide-state', requireAdmin, (req, res) => {
+  res.json({ currentSlide: db.currentSlide });
 });
 app.get('/api/admin/registrations.csv', requireAdmin, (req, res) => {
   const cols = ['createdAt', 'name', 'email', 'phone', 'institution', 'career', 'interests', 'news', 'event'];
