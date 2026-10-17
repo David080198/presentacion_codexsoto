@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap de Aprendizaje · Agentes de IA 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #03060b;
+      --panel: #08111d;
+      --panel2: #0d1a2b;
+      --ink: #e6f2ff;
+      --mute: #8aa0bb;
+      --dim: #4d6079;
+      --cyan: #26e0ff;
+      --green: #36ff8f;
+      --red: #ff3d57;
+      --blue: #3f82ff;
+      --amber: #ffc65c;
+      --line: rgba(110, 170, 240, 0.18);
+      --line2: rgba(110, 170, 240, 0.32);
+      --f-display: "Orbitron", "Audiowide", system-ui, sans-serif;
+      --f-label: "Rajdhani", "Arial Narrow", system-ui, sans-serif;
+      --f-body: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+      --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--f-body);
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--f-display);
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+    h1 {
+      font-size: 56px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 40px;
+      margin: 40px 0 20px;
+      color: var(--cyan);
+    }
+    h3 {
+      font-size: 28px;
+      margin: 20px 0 12px;
+    }
+    h4 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin: 16px 0 10px;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+    .subtitle {
+      font-size: 22px;
+      color: var(--mute);
+      margin-bottom: 40px;
+      font-family: var(--f-label);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .intro {
+      background: linear-gradient(135deg, rgba(38, 224, 255, 0.08) 0%, rgba(54, 255, 143, 0.05) 100%);
+      border: 1px solid var(--line2);
+      border-radius: 4px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+    .intro p {
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin: 30px 0;
+    }
+    .stage {
+      background: rgba(8, 17, 29, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 28px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .stage:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(38, 224, 255, 0.15);
+    }
+    .stage h3 {
+      color: var(--amber);
+      margin-top: 0;
+      font-size: 24px;
+    }
+    .stage .num {
+      font-family: var(--f-mono);
+      font-size: 14px;
+      color: var(--mute);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 10px;
+    }
+    .stage p {
+      font-size: 16px;
+      color: var(--mute);
+      margin-bottom: 18px;
+    }
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tag {
+      display: inline-block;
+      font-family: var(--f-mono);
+      font-size: 13px;
+      padding: 5px 10px;
+      border: 1px solid var(--line2);
+      border-radius: 3px;
+      color: var(--cyan);
+      background: rgba(38, 224, 255, 0.08);
+      white-space: nowrap;
+    }
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .cert {
+      background: rgba(13, 26, 43, 0.8);
+      border-left: 4px solid var(--line2);
+      border-radius: 4px;
+      padding: 24px;
+      transition: border-color 0.3s;
+    }
+    .cert:hover {
+      border-left-color: var(--green);
+    }
+    .cert h4 {
+      color: var(--green);
+      font-size: 18px;
+    }
+    .cert p {
+      font-size: 15px;
+      color: var(--mute);
+      margin: 10px 0;
+    }
+    .cert-provider {
+      font-family: var(--f-label);
+      font-size: 14px;
+      color: var(--dim);
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .timeline {
+      position: relative;
+      padding: 40px 0;
+      margin: 40px 0;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+    }
+    @media (max-width: 768px) {
+      .timeline::before {
+        left: 20px;
+      }
+    }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+      align-items: center;
+    }
+    .timeline-item:nth-child(even) {
+      direction: rtl;
+    }
+    .timeline-item:nth-child(even) > * {
+      direction: ltr;
+    }
+    @media (max-width: 768px) {
+      .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .timeline-item:nth-child(even) {
+        direction: ltr;
+      }
+    }
+    .timeline-dot {
+      position: relative;
+      z-index: 2;
+      width: 20px;
+      height: 20px;
+      background: var(--cyan);
+      border: 3px solid var(--bg);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--cyan);
+      justify-self: center;
+    }
+    .timeline-content {
+      background: rgba(8, 17, 29, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 24px;
+    }
+    .timeline-content h4 {
+      color: var(--amber);
+    }
+    .skills {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .skill-item {
+      background: rgba(38, 224, 255, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 16px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .industry-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .app {
+      background: rgba(54, 255, 143, 0.05);
+      border: 1px solid rgba(54, 255, 143, 0.3);
+      border-radius: 3px;
+      padding: 16px;
+      color: var(--ink);
+    }
+    .app strong {
+      color: var(--green);
+    }
+    .footer {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--dim);
+      font-size: 14px;
+      font-family: var(--f-mono);
+    }
+    .highlight {
+      color: var(--amber);
+      font-weight: 700;
+    }
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--cyan);
+    }
+    a:hover {
+      border-bottom-color: var(--amber);
+      color: var(--amber);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="highlight">Agentes de IA 2026</h1>
+    <p class="subtitle">Tu roadmap para construir y dominar agentes en 6 meses</p>
+
+    <div class="intro">
+      <p>
+        Este roadmap te guía desde los fundamentos de Python hasta la construcción de <strong>agentes LLM en producción</strong>.
+        Se basa en el camino que recorrí en los últimos 4 años (MIBI, CodexSoto, investigación en CIC-IPN).
+        Cada etapa incluye tecnologías, proyectos prácticos y certificaciones reales que <strong>aumentan tu valor en el mercado laboral</strong>.
+      </p>
+    </div>
+
+    <!-- ETAPAS -->
+    <h2>Las 6 etapas</h2>
+
+    <div class="roadmap-grid">
+      <div class="stage">
+        <div class="num">Mes 1</div>
+        <h3>Fundamentos</h3>
+        <p>Python sólido, estructuras de datos, APIs HTTP y bases de datos. La base de todo.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">Python 3.11+</span>
+          <span class="tag">Pandas</span>
+          <span class="tag">SQL</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">PostgreSQL</span>
+          <span class="tag">Git</span>
+        </div>
+        <p><strong>Objetivo:</strong> Desarrollar una API REST que consulte una base de datos.</p>
+      </div>
+
+      <div class="stage">
+        <div class="num">Mes 2</div>
+        <h3>Machine Learning</h3>
+        <p>Limpieza de datos, extracción de características, modelos de sklearn. ML clásico antes de los LLMs.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">Scikit-learn</span>
+          <span class="tag">NLTK</span>
+          <span class="tag">SpaCy</span>
+          <span class="tag">Matplotlib</span>
+          <span class="tag">Jupyter</span>
+        </div>
+        <p><strong>Objetivo:</strong> Entrenar un clasificador binario con un dataset curado.</p>
+      </div>
+
+      <div class="stage">
+        <div class="num">Mes 2–3</div>
+        <h3>NLP y Transformers</h3>
+        <p>Desde tokenización hasta modelos pre-entrenados. Los Transformers son el centro de todo hoy.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">Transformers (HF)</span>
+          <span class="tag">PyTorch</span>
+          <span class="tag">BERT / RoBERTa</span>
+          <span class="tag">Fine-tuning</span>
+          <span class="tag">LoRA</span>
+        </div>
+        <p><strong>Objetivo:</strong> Fine-tunear un modelo de clasificación con tus datos.</p>
+      </div>
+
+      <div class="stage">
+        <div class="num">Mes 3–4</div>
+        <h3>LLMs locales y en nube</h3>
+        <p>Ollama, Llama 3, GPT via API, prompt engineering. Haz un agente antes de los agentes.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">Ollama</span>
+          <span class="tag">Llama 3 / Mistral</span>
+          <span class="tag">OpenAI API</span>
+          <span class="tag">Prompt Engineering</span>
+          <span class="tag">LangChain</span>
+        </div>
+        <p><strong>Objetivo:</strong> Construye un RAG: carga tus PDFs y consulta con el LLM.</p>
+      </div>
+
+      <div class="stage">
+        <div class="num">Mes 4–5</div>
+        <h3>Agentes y herramientas</h3>
+        <p>Tool calling, bucle de razonamiento, ReAct. Un LLM que ejecuta código y consulta APIs.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">LangGraph</span>
+          <span class="tag">Tool calling</span>
+          <span class="tag">APIs externas</span>
+          <span class="tag">n8n</span>
+          <span class="tag">MCP</span>
+        </div>
+        <p><strong>Objetivo:</strong> Un agente que responda preguntas sobre tu base de datos y APIs.</p>
+      </div>
+
+      <div class="stage">
+        <div class="num">Mes 5–6</div>
+        <h3>Producción y escala</h3>
+        <p>Docker, CI/CD, monitoreo de tokens y costo, seguridad y observabilidad.</p>
+        <h4>Tecnologías</h4>
+        <div class="tech-list">
+          <span class="tag">Docker Compose</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">Logging y monitoreo</span>
+          <span class="tag">AWS / Azure</span>
+          <span class="tag">Evaluaciones</span>
+        </div>
+        <p><strong>Objetivo:</strong> Despliega tu agente en una VPS o nube con observabilidad.</p>
+      </div>
+    </div>
+
+    <!-- CERTIFICACIONES CLOUD -->
+    <h2>Certificaciones que transforman tu CV</h2>
+
+    <h3 style="color: var(--green); margin-top: 30px;">AWS (Amazon Web Services)</h3>
+    <div class="cert-grid">
+      <div class="cert">
+        <h4>AWS Certified Cloud Practitioner</h4>
+        <p><strong>Duración:</strong> 2–4 semanas</p>
+        <p><strong>Costo:</strong> $99 USD examen</p>
+        <p>Nivel básico. Entiende EC2, S3, RDS, Lambda. Ideal para comenzar. Muchos empleadores lo ven como "sabe qué es cloud".</p>
+        <div class="cert-provider">Requisito previo para certificaciones AWS más avanzadas.</div>
+      </div>
+
+      <div class="cert">
+        <h4>AWS Certified Solutions Architect Associate</h4>
+        <p><strong>Duración:</strong> 6–8 semanas</p>
+        <p><strong>Costo:</strong> $150 USD examen</p>
+        <p>Diseña soluciones en AWS. VPC, IAM, auto-scaling. <strong>Muy demandado.</strong> Salario +15% típicamente.</p>
+        <div class="cert-provider">Mejor ROI si trabajas con backend o DevOps.</div>
+      </div>
+
+      <div class="cert">
+        <h4>AWS Certified Developer Associate</h4>
+        <p><strong>Duración:</strong> 4–6 semanas</p>
+        <p><strong>Costo:</strong> $150 USD examen</p>
+        <p>Para los que coden en AWS. Lambda, DynamoDB, API Gateway. Si desarrollas agentes en la nube, tienes que conocer esto.</p>
+        <div class="cert-provider">Complementa bien con la Architect.</div>
+      </div>
+
+      <div class="cert">
+        <h4>AWS Certified Machine Learning Specialty</h4>
+        <p><strong>Duración:</strong> 8–12 semanas</p>
+        <p><strong>Costo:</strong> $300 USD examen</p>
+        <p>SageMaker, entrenamiento de modelos en AWS. <strong>Si trabajas con LLMs y ML, esto te abre puertas.</strong></p>
+        <div class="cert-provider">Requiere experiencia; no es tu primer examen AWS.</div>
+      </div>
+    </div>
+
+    <h3 style="color: var(--blue); margin-top: 30px;">Microsoft Azure</h3>
+    <div class="cert-grid">
+      <div class="cert">
+        <h4>AZ-900: Azure Fundamentals</h4>
+        <p><strong>Duración:</strong> 1–2 semanas</p>
+        <p><strong>Costo:</strong> $165 USD examen</p>
+        <p>Básico de Azure. Mínimo absoluto. Si trabajas en empresas con stack Microsoft, tienes que tenerlo.</p>
+        <div class="cert-provider">Gratuito si eres estudiante (GitHub Education).</div>
+      </div>
+
+      <div class="cert">
+        <h4>AZ-104: Azure Administrator Associate</h4>
+        <p><strong>Duración:</strong> 6–8 semanas</p>
+        <p><strong>Costo:</strong> $165 USD examen</p>
+        <p>Administra recursos en Azure: VMs, redes, almacenamiento. Similar a la Solutions Architect de AWS.</p>
+        <div class="cert-provider">Paso previo a roles más especializados.</div>
+      </div>
+
+      <div class="cert">
+        <h4>AZ-204: Azure Developer Associate</h4>
+        <p><strong>Duración:</strong> 6–8 semanas</p>
+        <p><strong>Costo:</strong> $165 USD examen</p>
+        <p>Desarrolla apps en Azure. Azure Functions, App Service, Cosmos DB. Para backend y APIs en Azure.</p>
+        <div class="cert-provider">Azure tiene Azure OpenAI Service: perfecto para agentes.</div>
+      </div>
+
+      <div class="cert">
+        <h4>AZ-700: Azure Network Engineer Associate</h4>
+        <p><strong>Duración:</strong> 4–6 semanas</p>
+        <p><strong>Costo:</strong> $165 USD examen</p>
+        <p>Redes en Azure. VPN, firewall, CDN. Especializado. Si tu carrera es DevOps/infraestructura.</p>
+        <div class="cert-provider">Menos demandado que Admin o Developer, pero muy específico.</div>
+      </div>
+    </div>
+
+    <h3 style="color: var(--amber); margin-top: 30px;">Google Cloud Platform (GCP)</h3>
+    <div class="cert-grid">
+      <div class="cert">
+        <h4>Google Cloud Associate Cloud Engineer</h4>
+        <p><strong>Duración:</strong> 6–8 semanas</p>
+        <p><strong>Costo:</strong> $200 USD examen</p>
+        <p>Diseña, despliega y gestiona GCP. Compute Engine, App Engine, BigQuery. GCP es fuerte en ML y datos.</p>
+        <div class="cert-provider">Si trabajas con data science o ML, GCP es excelente.</div>
+      </div>
+
+      <div class="cert">
+        <h4>Google Cloud Professional Data Engineer</h4>
+        <p><strong>Duración:</strong> 8–12 semanas</p>
+        <p><strong>Costo:</strong> $200 USD examen</p>
+        <p>BigQuery, Dataflow, ML. Si trabajas con datos masivos y necesitas entrenar modelos a escala.</p>
+        <div class="cert-provider">Muy especializado. Para Data Science roles con agentes.</div>
+      </div>
+    </div>
+
+    <!-- METODOLOGÍAS ÁGILES -->
+    <h2>Metodologías Ágiles · Certificaciones</h2>
+
+    <div class="cert-grid">
+      <div class="cert">
+        <h4>Certified Scrum Developer® (CSD®)</h4>
+        <p><strong>Duración:</strong> 2 días presencial o 4–6 semanas en línea</p>
+        <p><strong>Costo:</strong> $400–600 USD curso + $200 USD examen</p>
+        <p><strong>Importancia: MUY ALTA</strong>. Yo lo tengo (CSD®). Demuestra que sabes trabajar en equipos, sprints y que entiendes XP.</p>
+        <div class="cert-provider">CertiProf · Válida de por vida · Reconocida globalmente.</div>
+      </div>
+
+      <div class="cert">
+        <h4>Certified Scrum Product Owner® (CSPO®)</h4>
+        <p><strong>Duración:</strong> 2 días presencial o 4–6 semanas en línea</p>
+        <p><strong>Costo:</strong> $400–600 USD curso + $200 USD examen</p>
+        <p>Si quieres liderazgo o Product Manager. Entiende roadmap, backlog, stakeholders. Complementa el CSD.</p>
+        <div class="cert-provider">Juntos (CSD + CSPO) demuestras visión 360 del desarrollo.</div>
+      </div>
+
+      <div class="cert">
+        <h4>Certified Scrum Master® (CSM®)</h4>
+        <p><strong>Duración:</strong> 2 días presencial</p>
+        <p><strong>Costo:</strong> $400–600 USD curso + $200 USD examen</p>
+        <p>Facilita el team. Menos técnico que CSD. Si quieres ser Scrum Master, sí. Si eres developer, CSD es mejor.</p>
+        <div class="cert-provider">CertiProf · El CSM es un rol, no una habilidad de desarrollo.</div>
+      </div>
+
+      <div class="cert">
+        <h4>Scaled Agile Framework (SAFe) Certification</h4>
+        <p><strong>Duración:</strong> 1–2 días</p>
+        <p><strong>Costo:</strong> $500–800 USD según nivel (Practitioner, Technical, Leader)</p>
+        <p>Para grandes empresas con múltiples equipos. Si trabajas en tech corporativo, vale la pena. Menos en startups.</p>
+        <div class="cert-provider">Niveles: Practitioner → Technical Practitioner → Leader.</div>
+      </div>
+
+      <div class="cert">
+        <h4>Kanban System Design (KMP I)</h4>
+        <p><strong>Duración:</strong> 4–6 semanas</p>
+        <p><strong>Costo:</strong> $400–500 USD</p>
+        <p>Alternativa a Scrum. Mejor para equipos con trabajo en flujo continuo (MLOps, DevOps, Infraestructura). Visualiza bottlenecks.</p>
+        <div class="cert-provider">Less prescriptivo que Scrum. Gana tracción en proyectos ágiles.</div>
+      </div>
+    </div>
+
+    <!-- RUTA RECOMENDADA -->
+    <h2>Ruta recomendada por perfil</h2>
+
+    <h3 style="color: var(--cyan); margin-top: 30px;">Perfil 1: Full-stack + Agentes</h3>
+    <div class="skills">
+      <div class="skill-item"><strong>Orden:</strong> AWS Cloud Practitioner → CSD → AWS Solutions Architect → AWS Developer</div>
+      <div class="skill-item"><strong>Tiempo:</strong> 5–6 meses</div>
+      <div class="skill-item"><strong>Costo:</strong> ~$1000 USD (cursos + exámenes)</div>
+      <div class="skill-item"><strong>Valor laboral:</strong> ⭐⭐⭐⭐⭐ Muy demandado en startups de IA.</div>
+    </div>
+
+    <h3 style="color: var(--green); margin-top: 30px;">Perfil 2: Data Science + ML + Agentes</h3>
+    <div class="skills">
+      <div class="skill-item"><strong>Orden:</strong> AWS Cloud Practitioner → AWS ML Specialty → GCP Associate Cloud Engineer</div>
+      <div class="skill-item"><strong>Tiempo:</strong> 6–8 meses</div>
+      <div class="skill-item"><strong>Costo:</strong> ~$1200 USD</div>
+      <div class="skill-item"><strong>Valor laboral:</strong> ⭐⭐⭐⭐⭐ Raro encontrar developers con ML + cloud + agentes.</div>
+    </div>
+
+    <h3 style="color: var(--blue); margin-top: 30px;">Perfil 3: DevOps + Infraestructura + Agentes</h3>
+    <div class="skills">
+      <div class="skill-item"><strong>Orden:</strong> AWS Cloud Practitioner → AWS Solutions Architect → CSD → Kanban</div>
+      <div class="skill-item"><strong>Tiempo:</strong> 5–7 meses</div>
+      <div class="skill-item"><strong>Costo:</strong> ~$1000 USD</div>
+      <div class="skill-item"><strong>Valor laboral:</strong> ⭐⭐⭐⭐ Agentes en producción requieren DevOps fuerte.</div>
+    </div>
+
+    <!-- IMPACTO EN INDUSTRIA -->
+    <h2>Impacto de los agentes en la industria (2026)</h2>
+
+    <p>Los agentes no son futurismos. Hoy (2026), empresas reales usan agentes para:</p>
+
+    <div class="industry-apps">
+      <div class="app"><strong>Finanzas.</strong> CFO virtual que analiza ingresos y emite recomendaciones.</div>
+      <div class="app"><strong>Manufactura.</strong> Inspección visual automática y mantenimiento predictivo.</div>
+      <div class="app"><strong>Retail.</strong> Predicción de ventas e insumos; punto de venta inteligente.</div>
+      <div class="app"><strong>Soporte TI.</strong> Mesa de servicio que clasifica y resuelve tickets.</div>
+      <div class="app"><strong>Investigación.</strong> Agentes que leen Papers y generan resúmenes citados.</div>
+      <div class="app"><strong>Código.</strong> Agentes que editan repositorios, abren PRs, corren tests.</div>
+      <div class="app"><strong>Legal.</strong> Revisión de contratos con fuente citada.</div>
+      <div class="app"><strong>RH.</strong> Screening de CVs, programación de entrevistas.</div>
+    </div>
+
+    <h3>¿Cuánto gana un developer con agentes?</h3>
+    <p>
+      Basándome en datos de mercado 2026 (México, LATAM, US remoto):
+    </p>
+    <div class="skills">
+      <div class="skill-item">
+        <strong>Junior full-stack (sin agentes):</strong> $25k–$35k USD/año
+      </div>
+      <div class="skill-item">
+        <strong>Senior full-stack + 1 certificación cloud (sin agentes):</strong> $60k–$80k USD/año
+      </div>
+      <div class="skill-item">
+        <strong>Senior full-stack + cloud + CSD + agentes en producción:</strong> $100k–$150k USD/año
+      </div>
+      <div class="skill-item">
+        <strong>ML Engineer + agentes + AWS ML Specialty:</strong> $120k–$160k USD/año
+      </div>
+    </div>
+
+    <h3>Por qué los agentes son tan importantes ahora (2026)</h3>
+    <ul style="font-size: 16px; line-height: 1.8; color: var(--ink); margin: 20px 0;">
+      <li>
+        <strong>Escasez de talento.</strong> Pocos developers saben construir agentes. Demanda > Oferta.
+      </li>
+      <li>
+        <strong>ROI inmediato.</strong> Una empresa automatiza un proceso de 3 personas con un agente. Paga el desarrollo en 1–2 meses.
+      </li>
+      <li>
+        <strong>Competencia diferenciada.</strong> El que domina agentes cierra clientes que otros no pueden.
+      </li>
+      <li>
+        <strong>Multiherramienta.</strong> Los agentes atan LLMs, APIs, bases de datos y workflows. Es todo.
+      </li>
+      <li>
+        <strong>Modelos abiertos listos.</strong> Ollama + Llama 3 = agentes en tu laptop sin pagar a OpenAI.
+      </li>
+    </ul>
+
+    <!-- CÓMO EMPEZAR -->
+    <h2>Cómo empezar este mes</h2>
+
+    <div class="roadmap-grid">
+      <div class="stage">
+        <h3 style="font-size: 20px;">Semana 1</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 15px; color: var(--mute); line-height: 1.8;">
+          <li>Instala Ollama. Corre `ollama pull mistral`.</li>
+          <li>Haz un script Python que llame al LLM local via API.</li>
+          <li>Lee el artículo de ReAct (Yao et al., 2022).</li>
+        </ul>
+      </div>
+
+      <div class="stage">
+        <h3 style="font-size: 20px;">Semana 2</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 15px; color: var(--mute); line-height: 1.8;">
+          <li>Construye tu primer RAG: carga un PDF, haz queries.</li>
+          <li>Usa Chroma (vectorial) o pgvector (Postgres).</li>
+          <li>Repositorio en GitHub con README claro.</li>
+        </ul>
+      </div>
+
+      <div class="stage">
+        <h3 style="font-size: 20px;">Semana 3</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 15px; color: var(--mute); line-height: 1.8;">
+          <li>Agrega herramientas: define 2–3 funciones.</li>
+          <li>LLM decide cuándo llamarlas (tool calling).</li>
+          <li>Implementa el bucle ReAct.</li>
+        </ul>
+      </div>
+
+      <div class="stage">
+        <h3 style="font-size: 20px;">Semana 4</h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 15px; color: var(--mute); line-height: 1.8;">
+          <li>Despliega con Docker. Una API REST.</li>
+          <li>Documentación con Swagger.</li>
+          <li>Inicia tu solicitud de AWS Cloud Practitioner.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ENLACES Y RECURSOS -->
+    <h2>Recursos y enlaces</h2>
+    <p style="font-size: 16px;">
+      <strong>Repositorios:</strong> Todos mis proyectos en <a href="https://github.com/David080198">github.com/David080198</a>
+      — chatbots con Llama 3, RAG, agentes con ejecución de código, detección de plagio con ML.
+    </p>
+    <p style="font-size: 16px;">
+      <strong>Certificaciones oficiales:</strong>
+      <a href="https://aws.amazon.com/certification/">AWS Certification Portal</a> ·
+      <a href="https://learn.microsoft.com/en-us/certifications/">Microsoft Learn</a> ·
+      <a href="https://cloud.google.com/certification/">Google Cloud Certification</a> ·
+      <a href="https://www.scrum.org/">Scrum.org</a>
+    </p>
+    <p style="font-size: 16px;">
+      <strong>Comunidad:</strong> Únete a canales de Discord/Slack de IA local, participa en hackatones, comparte tu código.
+      El mejor aprendizaje es construir en público.
+    </p>
+
+    <div class="footer">
+      <p style="margin-bottom: 20px;">
+        <strong>MCD David Soto Osorio</strong> · Fundador de CodexSoto · Investigador en CIC-IPN · Data Science & ML Engineer en MIBI
+      </p>
+      <p>
+        LinkedIn: <a href="https://linkedin.com/in/david-soto-osorio-972b3723b">david-soto-osorio</a> ·
+        GitHub: <a href="https://github.com/David080198">David080198</a> ·
+        Email: <a href="mailto:davidsotoesime@outlook.com">davidsotoesime@outlook.com</a>
+      </p>
+      <p style="margin-top: 20px; color: var(--dim);">
+        Últimas actualizaciones: Octubre 2026 · Precios y certificaciones sujetos a cambios · Información de mercado laboral estimada.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,26 +1,64 @@
-# CodexSoto Live
+# CodexSoto Live · Agentes de IA 2026
 
-App para la conferencia **Agentes de IA 2026**: el público escanea un QR, vota desde el celular, manda preguntas y se registra al final. La presentación se sirve desde la misma app: al cambiar de lámina, los celulares cambian solos de dinámica y los resultados aparecen en vivo en las láminas.
+App interactiva para la conferencia **Agentes de IA 2026**: el público escanea un QR, vota desde el celular, manda preguntas y se registra al final. La presentación se sirve desde la misma app: al cambiar de lámina, los celulares cambian solos de dinámica y los resultados aparecen en vivo en las láminas.
+
+**Tema:** De PLN y Transformers a agentes LLM en producción · 6 niveles · 42 diapositivas interactivas.
+
+## Rutas principales
 
 | Ruta | Para quién | Qué hace |
 | --- | --- | --- |
 | `/` | Público (QR) | Votaciones, preguntas y registro |
-| `/deck?token=TU_TOKEN` | Tú, en el proyector | La presentación; controla los celulares y muestra resultados |
-| `/admin` | Tú | Panel: cambiar dinámica a mano, revelar respuestas, moderar preguntas, descargar registros en CSV, reiniciar |
+| `/deck?token=TU_TOKEN` | Tú, en el proyector | La presentación (42 slides); controla los celulares y muestra resultados en vivo |
+| `/admin` | Tú | Panel: cambiar dinámica, revelar respuestas, moderar preguntas, descargar registros CSV |
+| `/roadmap` | Estudiantes y developers | **Guía de aprendizaje:** 6 meses, certificaciones cloud (AWS/Azure/GCP) y ágiles (CSD, CSM) |
 | `/healthz` | Dokploy | Chequeo de salud |
 
-## Qué dinámica activa cada lámina
+## Contenido de la presentación (6 niveles)
 
 | Lámina | Los celulares muestran |
 | --- | --- |
 | Escanea y participa | Bienvenida y contador de conectados |
 | ¿Azul o roja? | Votación de píldoras |
 | ¿Humano o máquina? | 4 textos para votar; cada uno se revela cuando lo revelas en la lámina |
-| Todo un LLM se reduce a esto | ¿Qué palabra sigue? |
+| Todo un LLM se reduce a esto | ¿Qué palabra sigue? (temperatura ajustable) |
 | Preguntas del público | Pestaña de preguntas (las más votadas se ven en la lámina) |
-| Cierre | Formulario de registro y botón para entrar a la plataforma |
+| Cierre y registro | Formulario de registro + botón para entrar a CodexSoto |
 
-Solo `/deck?token=...` cambia la dinámica. Si abres `/deck` sin token, ves los resultados pero no controlas los celulares.
+**Los 6 niveles:**
+
+1. **El lenguaje** — PLN, limpieza, tokenización y BPE. Cómo una máquina ve el texto.
+2. **El significado** — Embeddings, word2vec, analogías y un clasificador de canciones infantiles (tu proyecto real).
+3. **El Arquitecto** — Transformer, atención multi-cabeza, codificación posicional, Q·K·V.
+4. **El Oráculo** — LLMs: predicción del siguiente token, escala, entrenamiento en 3 fases, límites (alucinación, conocimiento congelado, sin acción).
+5. **Los Agentes** ⭐ — Herramientas, memoria, RAG, ReAct, tool calling, MCP, multiagente, casos reales (CFO virtual, Aceitunaos POS, mesa de servicio).
+6. **El mundo real** — Aplicaciones por sector, riesgos de seguridad (prompt injection), costo por token, ruta de aprendizaje en 6 meses.
+
+## Roadmap de aprendizaje (6 meses)
+
+**`/roadmap`** incluye una **guía estructurada de 6 meses** para que estudiantes y developers pasen de cero a construir agentes en producción:
+
+- **6 etapas:** fundamentos → ML → Transformers → LLMs locales → Agentes → Producción.
+- **Certificaciones cloud:** AWS Solutions Architect, AWS Developer, AWS ML Specialty, Azure, GCP.
+- **Metodologías ágiles:** Certified Scrum Developer (CSD®), CSPO, CSM, Kanban.
+- **Impacto en industria:** Dónde trabajan los agentes hoy (2026), salarios, casos reales.
+- **Repositorios:** Enlaces a mis proyectos: RAG, agentes con código, detectores de plagio, chatbots.
+
+## Por qué los agentes en 2026
+
+Los agentes no son hype. Son **realidad productiva**:
+
+- **Escasez de talento:** Pocos developers saben construirlos.
+- **ROI inmediato:** Una empresa automatiza un proceso de 3 personas con un agente. Paga la dev en 1–2 meses.
+- **Multiherramienta:** Atan LLMs, APIs, bases de datos, workflows. Es el nexo de todo.
+- **Modelos abiertos listos:** Ollama + Llama 3 = agentes sin pagar a OpenAI.
+- **Diferenciación:** Quien domina agentes cierra clientes que otros no pueden.
+
+**Mi experiencia:**
+- CFO virtual conectado a SAP y Shopify (análisis financiero automático).
+- Aceitunaos POS: predicción de ventas e insumos + agentes de monitoreo en vivo.
+- Mesa de servicio: clasificación y resolución automática de tickets.
+- Detección de plagio con Transformers + agentes de búsqueda.
 
 ## Desplegar en Dokploy
 
