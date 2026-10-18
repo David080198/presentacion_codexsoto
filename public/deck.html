@@ -1067,7 +1067,7 @@ function go(n,back=false){
   $('#nBody').textContent=s.dataset.notes||'';
   $('#nSlide').textContent='Lámina '+(cur+1)+' de '+slides.length+(slides[cur+1]?' · sigue: '+(slides[cur+1].dataset.level||''):'');
   try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
-  if(window.__liveSlide){const t=s.querySelector('h1,h2');window.__liveSlide(s.id,{title:t?t.textContent:'',level:s.dataset.level||''})}
+  if(window.__liveSlide){const t=s.querySelector('h1,h2');window.__liveSlide(s.id,{title:t?t.textContent:'',level:s.dataset.level||'',slide:cur})}
   if(H[s.id]&&H[s.id].enter)H[s.id].enter(s,back);
 }
 function next(){const s=slides[cur];if(t0===null)t0=Date.now();
@@ -1180,9 +1180,13 @@ function renderTok(){const t=$('#tokIn').value;const toks=tokenize(t);
   $('#tokOut').innerHTML=toks.map((k,i)=>{const id=hash(k)%50257;return '<span class="tok" style="--h:'+(id%360)+';animation-delay:'+(i*35)+'ms">'+esc(k)+'<small>'+id+'</small></span>'}).join('');
   const nc=Array.from(t).length;$('#tokC').textContent=nc;$('#tokN').textContent=toks.length;$('#tokR').textContent=toks.length?(nc/toks.length).toFixed(1):'0'}
 $('#tokIn').addEventListener('input',renderTok);
-$$('#tokModes .btn').forEach(b=>b.onclick=()=>{tokMode=b.dataset.m;$$('#tokModes .btn').forEach(x=>x.classList.toggle('on',x===b));renderTok()});
+const TOK_MODES=['word','sub','char'];
+function setTokMode(m){tokMode=m;$$('#tokModes .btn').forEach(x=>x.classList.toggle('on',x.dataset.m===m));renderTok()}
+$$('#tokModes .btn').forEach(b=>b.onclick=()=>setTokMode(b.dataset.m));
 $$('#s-tok [data-s]').forEach(b=>b.onclick=()=>{$('#tokIn').value=b.dataset.s;renderTok()});
-H['s-tok']={enter:renderTok};
+H['s-tok']={enter:renderTok,
+  next(){const i=TOK_MODES.indexOf(tokMode);if(i<TOK_MODES.length-1){setTokMode(TOK_MODES[i+1]);return true}return false},
+  prev(){const i=TOK_MODES.indexOf(tokMode);if(i>0){setTokMode(TOK_MODES[i-1]);return true}return false}};
 
 /* ---------- 11 BPE ---------- */
 const CORPUS=[['perro',5],['perros',3],['perrito',2],['gato',4],['gatos',3],['gatito',2]];
@@ -1460,6 +1464,7 @@ H['s-end']={enter(){if(qrDone)return;qrDone=true;const el=$('#qr');try{new QRCod
 let start=0;try{const m=location.hash.match(/^#(\d+)$/);if(m)start=Math.min(slides.length-1,Math.max(0,+m[1]-1))}catch(e){}
 cur=start;go(start);
 window.__goToSlide=go;
+window.__step=dir=>{dir==='prev'?prev():next()};
 })();
 </script>
 <script>
@@ -1472,7 +1477,8 @@ const ACT={'s-join':'lobby','s-level':'level','s-pills':'pills','s-real':'real',
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let live=false,st=null;
 function post(u,b){if(!live||!token)return;fetch(u,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':token},body:JSON.stringify(b)}).catch(()=>{})}
-window.__liveSlide=(id,meta)=>post('/api/admin/activity',{activity:ACT[id]||'lobby',title:(meta&&meta.title)||'',level:(meta&&meta.level)||''});
+window.__liveSlide=(id,meta)=>{if(meta&&typeof meta.slide==='number')lastSlide=meta.slide;
+  post('/api/admin/activity',{activity:ACT[id]||'lobby',title:(meta&&meta.title)||'',level:(meta&&meta.level)||'',slide:(meta&&meta.slide)})};
 window.__liveReveal=(poll,on)=>post('/api/admin/reveal',{poll,value:on});
 function qr(el,url,size){el.innerHTML='';try{new QRCode(el,{text:url,width:size,height:size,colorDark:'#03060b',colorLight:'#ffffff'})}catch(e){el.style.display='flex';el.style.alignItems='center';el.style.justifyContent='center';el.innerHTML='<span style="font-family:monospace;color:#03060b;font-size:26px">'+esc(url)+'</span>'}}
 function setup(){const base=live?location.origin:LIVE_URL;qr($('#joinQr'),base,424);$('#joinUrl').textContent=base.replace(/^https?:\/\//,'');
@@ -1493,7 +1499,12 @@ function render(){if(!st)return;
   if(qs.length)$('#qaList').innerHTML=qs.map(q=>'<div class="qa-i"><b>▲ '+q.votes+'</b><p>'+esc(q.text)+'</p></div>').join('')}
 let lastSlide=-1;
 function syncSlide(n){if(typeof n!=='number'||n===lastSlide)return;lastSlide=n;if(window.__goToSlide)window.__goToSlide(n)}
-function connect(){const es=new EventSource('/events?role=deck');es.onmessage=e=>{try{st=JSON.parse(e.data);syncSlide(st.currentSlide);render()}catch(x){}}}
+function connect(){const es=new EventSource('/events?role=deck');
+  es.onmessage=e=>{try{st=JSON.parse(e.data);syncSlide(st.currentSlide);render()}catch(x){}};
+  es.addEventListener('cmd',e=>{try{const c=JSON.parse(e.data);
+    if(c.action==='next'||c.action==='prev')window.__step(c.action);
+    else if(c.action==='goto'&&typeof c.slide==='number')window.__goToSlide(c.slide);
+  }catch(x){}})}
 fetch('/api/state',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(s=>{if(!s||!s.counts)throw 0;live=true;document.documentElement.classList.add('live');st=s;setup();render();syncSlide(st.currentSlide);connect();
   const a=document.querySelector('.slide.active');if(a){const t=a.querySelector('h1,h2');window.__liveSlide(a.id,{title:t?t.textContent:'',level:a.dataset.level||''})}}).catch(()=>setup());
 })();

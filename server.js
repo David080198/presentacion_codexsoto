@@ -91,6 +91,11 @@ function broadcast() {
     for (const c of clients) c.res.write(msg);
   }, 150);
 }
+// Envía un comando inmediato (sin debounce) solo a la pantalla de la presentación, para control remoto paso a paso
+function sendToDeck(cmd) {
+  const msg = 'event: cmd\ndata: ' + JSON.stringify(cmd) + '\n\n';
+  for (const c of clients) if (c.role === 'deck') c.res.write(msg);
+}
 setInterval(() => { for (const c of clients) c.res.write(': ping\n\n'); }, 20000);
 
 /* ---------- App ---------- */
@@ -236,8 +241,9 @@ app.post('/api/admin/activity', requireAdmin, (req, res) => {
   if (!ACTIVITIES.includes(a)) return res.status(400).json({ error: 'Actividad inválida.' });
   const title = typeof req.body?.title === 'string' ? clean(req.body.title, 160) : db.slideTitle;
   const level = typeof req.body?.level === 'string' ? clean(req.body.level, 80) : db.slideLevel;
-  if (db.activity !== a || db.slideTitle !== title || db.slideLevel !== level) {
-    db.activity = a; db.slideTitle = title; db.slideLevel = level; save(); broadcast();
+  const slide = Number.isInteger(req.body?.slide) && req.body.slide >= 0 && req.body.slide < TOTAL_SLIDES ? req.body.slide : db.currentSlide;
+  if (db.activity !== a || db.slideTitle !== title || db.slideLevel !== level || db.currentSlide !== slide) {
+    db.activity = a; db.slideTitle = title; db.slideLevel = level; db.currentSlide = slide; save(); broadcast();
   }
   res.json({ ok: true });
 });
@@ -266,13 +272,14 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
 });
 app.post('/api/navigate', rateLimit(60, 60000), (req, res) => {
   const { command, slide } = req.body || {};
-  if (command === 'next' && db.currentSlide < TOTAL_SLIDES - 1) db.currentSlide++;
-  else if (command === 'prev' && db.currentSlide > 0) db.currentSlide--;
-  else if (command === 'goto' && typeof slide === 'number' && slide >= 0 && slide < TOTAL_SLIDES) db.currentSlide = slide;
-  else if (command === 'reset') db.currentSlide = 0;
-  else { return res.status(400).json({ error: 'Comando inválido.' }); }
-  save(); broadcast();
-  res.json({ ok: true, currentSlide: db.currentSlide });
+  let cmd;
+  if (command === 'next' || command === 'prev') cmd = { action: command };
+  else if (command === 'reset') cmd = { action: 'goto', slide: 0 };
+  else if (command === 'goto' && Number.isInteger(slide) && slide >= 0 && slide < TOTAL_SLIDES) cmd = { action: 'goto', slide };
+  else return res.status(400).json({ error: 'Comando inválido.' });
+  if (![...clients].some((c) => c.role === 'deck')) return res.status(409).json({ error: 'La pantalla de la presentación no está conectada.' });
+  sendToDeck(cmd);
+  res.json({ ok: true });
 });
 app.get('/api/slide-state', requireAdmin, (req, res) => {
   res.json({ currentSlide: db.currentSlide });
