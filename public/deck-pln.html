@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curso de PLN · CodexSoto</title>
+<meta name="description" content="Curso de Procesamiento de Lenguaje Natural (PLN) — presentacion interactiva de CodexSoto">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#070b14; --panel:#0d1526; --line:#1c3350; --ink:#eef3f8; --mute:#8ea0bb; --dim:#4b5872; --cyan:#22d3ee;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;font-family:'Inter',sans-serif}
+#deck{position:fixed;inset:0;background:var(--bg)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.03)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;opacity:0;visibility:hidden;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease,visibility 0s .5s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease,transform .5s ease,visibility 0s;z-index:2}
+.pln-ic{display:block;flex:none}
+
+/* HUD, fijo al viewport (fuera de #stage, no se escala) */
+#hud-top{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.06);z-index:20}
+#hud-top i{display:block;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);transition:width .4s}
+#hud-bottom{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;gap:16px;z-index:20;background:linear-gradient(0deg,rgba(7,11,20,.92),rgba(7,11,20,0))}
+#hud-bottom .side{display:flex;align-items:center;gap:10px}
+.nbtn{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--mute);background:rgba(13,21,38,.85);
+  border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer;transition:border-color .2s,color .2s}
+.nbtn:hover{border-color:var(--cyan);color:var(--ink)}
+.nbtn:disabled{opacity:.35;cursor:default}
+#counter{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim);letter-spacing:.5px}
+#homebtn{text-decoration:none}
+
+/* Indice de modulos */
+#idx-overlay{position:fixed;inset:0;background:rgba(5,8,14,.85);backdrop-filter:blur(6px);z-index:30;
+  display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+#idx-overlay.open{opacity:1;visibility:visible;transition:opacity .25s,visibility 0s}
+#idx-panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px;width:min(560px,86vw);
+  max-height:76vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
+#idx-panel h2{font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 10px;color:var(--ink)}
+.idx-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;border:1px solid transparent;
+  background:rgba(255,255,255,.02);cursor:pointer;text-align:left;color:var(--ink);font-family:'Inter',sans-serif}
+.idx-item:hover{border-color:var(--cyan);background:rgba(34,211,238,.06)}
+.idx-item .n{font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:13px;min-width:24px}
+.idx-item b{font-size:15px}
+#idx-close{align-self:flex-end;background:none;border:none;color:var(--mute);font-size:14px;cursor:pointer;margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="hud-top"><i id="progress"></i></div>
+
+<div id="deck">
+  <div id="stage">
+<div class="slide" id="cover" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:row;align-items:center;gap:72px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 78% 28%, rgba(34,211,238,0.16), rgba(7,11,20,0) 55%)"></div>
+<div style="position:absolute;left:0px;top:0px;width:8px;height:1080px;background:#22d3ee;opacity:0.5"></div>
+<div style="flex:0 0 960px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;align-items:center;gap:12px;background:#0d1526;border:1px solid #1c3350;border-radius:999px;padding:14px 26px;align-self:flex-start">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#8ea0bb;letter-spacing:2px">CURSO EN VIVO // DURACIÓN 3 HORAS</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:76px;font-weight:700;line-height:1.05;color:#eef3f8">CURSO DE PROCESAMIENTO</h1>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:76px;font-weight:700;line-height:1.05;color:#22d3ee">DE LENGUAJE NATURAL</h1>
+</div>
+<p style="font-size:28px;line-height:1.5;color:#8ea0bb;width:900px">De la tokenización a los transformers: domina las técnicas para que las máquinas comprendan, analicen y generen lenguaje humano.</p>
+<div style="display:flex;gap:20px">
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:20px 28px;display:flex;flex-direction:column;gap:4px">
+<h3 style="font-family:'JetBrains Mono', monospace;font-size:34px;font-weight:700;color:#22d3ee">6</h3>
+<p style="font-size:20px;color:#8ea0bb">Módulos</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:20px 28px;display:flex;flex-direction:column;gap:4px">
+<h3 style="font-family:'JetBrains Mono', monospace;font-size:34px;font-weight:700;color:#22d3ee">3h</h3>
+<p style="font-size:20px;color:#8ea0bb">Duración</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:20px 28px;display:flex;flex-direction:column;gap:4px">
+<h3 style="font-family:'JetBrains Mono', monospace;font-size:34px;font-weight:700;color:#22d3ee">100%</h3>
+<p style="font-size:20px;color:#8ea0bb">Práctico</p>
+</div>
+</div>
+</div>
+<div style="flex:1;align-self:center;background:#0d1526;border:1px solid #1c3350;border-radius:18px;box-shadow:0px 40px 90px rgba(0,0,0,0.5);display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid #1c3350">
+<div style="display:flex;gap:10px">
+<div style="width:14px;height:14px;border-radius:50%;background:#f87171"></div>
+<div style="width:14px;height:14px;border-radius:50%;background:#fbbf24"></div>
+<div style="width:14px;height:14px;border-radius:50%;background:#34d399"></div>
+</div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">nlp_curso.py</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;padding:36px 32px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1"><span style="color:#f472b6">from</span> transformers <span style="color:#f472b6">import</span> <span style="color:#22d3ee">pipeline</span></p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1"><span style="color:#f472b6">class</span> <span style="color:#22d3ee">NLPEngineer</span>:</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">&#160;&#160;&#160;&#160;<span style="color:#f472b6">def</span> <span style="color:#22d3ee">__init__</span>(<span style="color:#f472b6">self</span>):</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;self.curso = <span style="color:#86efac">"PLN desde cero"</span></p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;self.modulos = 6</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;self.nivel = <span style="color:#86efac">"Intermedio"</span></p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">engineer = <span style="color:#22d3ee">NLPEngineer</span>()</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#cbd5e1">engineer.start_course()</p>
+</div>
+</div>
+
+</div>
+<div class="slide" id="agenda" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">ROADMAP // 3 HORAS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Agenda del curso</h2>
+</div>
+<table style="font-family:'Inter', sans-serif;font-size:24px;color:#eef3f8">
+<tr style="background:#0d1526">
+<th style="width:10%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px;font-family:'JetBrains Mono', monospace">#</th>
+<th style="width:38%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px">Módulo</th>
+<th style="width:37%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px">Contenido</th>
+<th style="width:15%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px">Duración</th>
+</tr>
+<tr style="background:#0a0f1c">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">01</td>
+<td style="padding:18px 20px">Fundamentos del PLN</td>
+<td style="padding:18px 20px;color:#8ea0bb">Qué es, aplicaciones, pipeline</td>
+<td style="padding:18px 20px;color:#8ea0bb">25 min</td>
+</tr>
+<tr style="background:#0d1526">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">02</td>
+<td style="padding:18px 20px">Preprocesamiento de texto</td>
+<td style="padding:18px 20px;color:#8ea0bb">Tokenización, stopwords, NLTK/spaCy</td>
+<td style="padding:18px 20px;color:#8ea0bb">25 min</td>
+</tr>
+<tr style="background:#0a0f1c">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">03</td>
+<td style="padding:18px 20px">Representación de texto</td>
+<td style="padding:18px 20px;color:#8ea0bb">BoW, TF-IDF, embeddings</td>
+<td style="padding:18px 20px;color:#8ea0bb">30 min</td>
+</tr>
+<tr style="background:#122133">
+<td style="padding:14px 20px;color:#22d3ee;font-family:'JetBrains Mono', monospace">··</td>
+<td style="padding:14px 20px;color:#22d3ee;font-family:'JetBrains Mono', monospace">Descanso</td>
+<td style="padding:14px 20px;color:#22d3ee">Café / estiramiento</td>
+<td style="padding:14px 20px;color:#22d3ee">10 min</td>
+</tr>
+<tr style="background:#0d1526">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">04</td>
+<td style="padding:18px 20px">Modelos y tareas clásicas</td>
+<td style="padding:18px 20px;color:#8ea0bb">Clasificación, sentimiento, NER</td>
+<td style="padding:18px 20px;color:#8ea0bb">20 min</td>
+</tr>
+<tr style="background:#0a0f1c">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">05</td>
+<td style="padding:18px 20px">Transformers y LLMs</td>
+<td style="padding:18px 20px;color:#8ea0bb">Atención, BERT/GPT, Hugging Face</td>
+<td style="padding:18px 20px;color:#8ea0bb">40 min</td>
+</tr>
+<tr style="background:#0d1526">
+<td style="padding:18px 20px;color:#4b5872;font-family:'JetBrains Mono', monospace">06</td>
+<td style="padding:18px 20px">Práctica y cierre</td>
+<td style="padding:18px 20px;color:#8ea0bb">Proyecto end-to-end, recursos</td>
+<td style="padding:18px 20px;color:#8ea0bb">30 min</td>
+</tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">02 / 24</p>
+
+</div>
+<div class="slide" id="objetivos" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">AL TERMINAR ESTE CURSO</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Objetivos de aprendizaje</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12.5V17c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 10v6"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Fundamentos sólidos</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Entender qué es el PLN y el pipeline completo de un proyecto real.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Preprocesamiento</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Limpiar y normalizar texto con NLTK y spaCy, paso a paso.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Representación</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Convertir texto en números: BoW, TF-IDF y embeddings.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Modelos clásicos</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Construir clasificadores de texto y detectar sentimiento y entidades.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Transformers y LLMs</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Comprender la atención, BERT, GPT y los modelos de lenguaje actuales.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:40px;height:40px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Hugging Face</h3>
+<p style="font-size:22px;color:#8ea0bb;line-height:1.4">Usar pipelines listos para producción en minutos.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">03 / 24</p>
+</div>
+<div class="slide" id="mod1-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">01</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 01 // 25 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Fundamentos del PLN</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">Qué es el procesamiento de lenguaje natural, dónde se usa hoy y cómo luce el pipeline de un proyecto real.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">04 / 24</p>
+</div>
+<div class="slide" id="que-es-pln" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 01 // FUNDAMENTOS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">¿Qué es el PLN?</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:center">
+<div style="flex:0 0 820px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:32px;line-height:1.5;color:#eef3f8">El <b>Procesamiento de Lenguaje Natural</b> es la rama de la Inteligencia Artificial que permite a las máquinas leer, entender, interpretar y generar lenguaje humano.</p>
+<p style="font-size:26px;line-height:1.5;color:#8ea0bb">Combina lingüística computacional con machine learning y deep learning para convertir texto o voz en información estructurada que un programa puede usar.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:18px;padding:40px;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#4b5872;letter-spacing:1px">TRES CAPACIDADES CLAVE</p>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:30px;height:30px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+<p style="font-size:24px;color:#eef3f8"><b>Entender</b> — extraer significado e intención</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:30px;height:30px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+<p style="font-size:24px;color:#eef3f8"><b>Procesar</b> — estructurar texto no estructurado</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:30px;height:30px"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+<p style="font-size:24px;color:#eef3f8"><b>Generar</b> — producir lenguaje natural y coherente</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">05 / 24</p>
+
+</div>
+<div class="slide" id="aplicaciones" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 01 // FUNDAMENTOS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Aplicaciones reales del PLN</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:24px">
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Chatbots y asistentes</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Siri, Alexa, soporte automatizado</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Traducción automática</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Google Translate, DeepL</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Análisis de sentimiento</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Reputación de marca, reseñas</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Buscadores</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Comprensión de consultas</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Detección de spam</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Filtros de correo y fraude</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+<h3 style="font-size:24px;font-weight:600;color:#eef3f8">Modelos generativos</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">ChatGPT, Claude, copilots de código</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">06 / 24</p>
+</div>
+<div class="slide" id="evolucion-pln" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 01 // FUNDAMENTOS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">La evolución del PLN</h2>
+</div>
+<div style="display:flex;align-items:stretch;gap:20px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">~1960s–90s</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Basado en reglas</h3>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Gramáticas y diccionarios escritos a mano</p>
+</div>
+<div style="width:60px;height:26px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8594;</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">~1990s–2010s</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Estadístico / ML</h3>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Naive Bayes, SVM, TF-IDF, n-gramas</p>
+</div>
+<div style="width:60px;height:26px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8594;</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">~2013–2018</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Deep Learning</h3>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Word2Vec, RNN, LSTM, embeddings</p>
+</div>
+<div style="width:60px;height:26px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8594;</div>
+<div style="flex:1;background:#102233;border:1px solid #22d3ee;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">2018 — hoy</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Transformers / LLMs</h3>
+<p style="font-size:19px;color:#bfe9f2;line-height:1.4">BERT, GPT, atención, modelos masivos</p>
+</div>
+</div>
+<p style="font-size:24px;color:#8ea0bb;line-height:1.5;width:1400px">Cada etapa no reemplaza del todo a la anterior: hoy seguimos usando TF-IDF y reglas simples cuando el problema no necesita un LLM.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">07 / 24</p>
+</div>
+<div class="slide" id="pipeline-proyecto" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 01 // FUNDAMENTOS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Pipeline de un proyecto de PLN</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">1</p></div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Recolección de datos</h3>
+<p style="font-size:20px;color:#8ea0bb">Reviews, tickets, redes sociales, documentos</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">2</p></div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Limpieza y normalización</h3>
+<p style="font-size:20px;color:#8ea0bb">Minúsculas, puntuación, ruido</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">3</p></div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Tokenización</h3>
+<p style="font-size:20px;color:#8ea0bb">Dividir el texto en palabras o subpalabras</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">4</p></div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Representación vectorial</h3>
+<p style="font-size:20px;color:#8ea0bb">BoW, TF-IDF o embeddings</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">5</p></div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Modelado</h3>
+<p style="font-size:20px;color:#8ea0bb">Clásico, red neuronal o LLM preentrenado</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:28px">
+<div style="width:56px;height:56px;border-radius:50%;background:#102233;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;font-weight:700;color:#22d3ee">6</p></div>
+<div style="flex:1;background:#102233;border:1px solid #22d3ee;border-radius:14px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between">
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Evaluación y despliegue</h3>
+<p style="font-size:20px;color:#bfe9f2">Métricas, validación, producción</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">08 / 24</p>
+</div>
+<div class="slide" id="mod2-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">02</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 02 // 25 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Preprocesamiento de texto</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">Normalización, tokenización, stopwords, stemming y lematización con NLTK y spaCy.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">09 / 24</p>
+</div>
+<div class="slide" id="normalizacion-tokenizacion" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 02 // PREPROCESAMIENTO</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Normalización y tokenización</h2>
+</div>
+<div style="display:flex;gap:56px">
+<div style="flex:0 0 760px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">NORMALIZACIÓN</p>
+<p style="font-size:24px;color:#8ea0bb;line-height:1.5">Estandarizar el texto antes de procesarlo: minúsculas, acentos, espacios y caracteres especiales.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">TOKENIZACIÓN</p>
+<p style="font-size:24px;color:#8ea0bb;line-height:1.5">Dividir el texto en unidades mínimas (tokens): palabras, subpalabras o caracteres.</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:20px;color:#eef3f8"><b>Palabra:</b> <span style="color:#8ea0bb">"gatos" → un token</span></p>
+<p style="font-size:20px;color:#eef3f8"><b>Subpalabra:</b> <span style="color:#8ea0bb">"jugando" → "jug" + "ando"</span></p>
+<p style="font-size:20px;color:#eef3f8"><b>Carácter:</b> <span style="color:#8ea0bb">"PLN" → "P" + "L" + "N"</span></p>
+</div>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:18px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #1c3350">
+<div style="display:flex;gap:10px">
+<div style="width:12px;height:12px;border-radius:50%;background:#f87171"></div>
+<div style="width:12px;height:12px;border-radius:50%;background:#fbbf24"></div>
+<div style="width:12px;height:12px;border-radius:50%;background:#34d399"></div>
+</div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:16px;color:#4b5872">tokenizar.py</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;padding:28px 26px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1"><span style="color:#f472b6">import</span> nltk</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1">texto = <span style="color:#86efac">"¡El PLN es increíble!"</span></p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1">texto = texto.lower()</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1">tokens = nltk.<span style="color:#22d3ee">word_tokenize</span>(texto)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1"><span style="color:#f472b6">print</span>(tokens)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#4b5872">#&#160;['¡el', 'pln', 'es', 'increíble', '!']</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">10 / 24</p>
+
+</div>
+<div class="slide" id="stopwords-stemming-lemma" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 02 // PREPROCESAMIENTO</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Stopwords, stemming y lematización</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:18px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:34px;height:34px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Stopwords</h3>
+<p style="font-size:21px;color:#8ea0bb;line-height:1.45">Palabras muy frecuentes y de bajo valor semántico: "el", "la", "de", "que".</p>
+<div style="background:#0a0f1c;border-radius:10px;padding:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#8ea0bb">"el gato <span style="color:#4b5872;text-decoration:line-through">de</span> <span style="color:#4b5872;text-decoration:line-through">la</span> casa"</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">→ "gato casa"</p>
+</div>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:18px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:34px;height:34px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Stemming</h3>
+<p style="font-size:21px;color:#8ea0bb;line-height:1.45">Corta la palabra a su raíz de forma mecánica, sin analizar gramática. Rápido pero tosco.</p>
+<div style="background:#0a0f1c;border-radius:10px;padding:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#8ea0bb">"corriendo", "corredor"</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">→ "corr"</p>
+</div>
+</div>
+<div style="flex:1;background:#102233;border:1px solid #22d3ee;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:18px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:34px;height:34px"><path d="m9 12 2 2 4-4"/><path d="M12 2 4.5 5v6c0 5 3.3 8.5 7.5 10 4.2-1.5 7.5-5 7.5-10V5L12 2z"/></svg>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Lematización</h3>
+<p style="font-size:21px;color:#bfe9f2;line-height:1.45">Reduce a la forma canónica usando gramática y diccionario. Más preciso que el stemming.</p>
+<div style="background:#0a0f1c;border-radius:10px;padding:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#bfe9f2">"corriendo", "corrió"</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">→ "correr"</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">11 / 24</p>
+</div>
+<div class="slide" id="herramientas-nltk-spacy" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 02 // PREPROCESAMIENTO</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Herramientas: NLTK y spaCy</h2>
+</div>
+<table style="font-family:'Inter', sans-serif;font-size:23px;color:#eef3f8">
+<tr style="background:#0d1526">
+<th style="width:22%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px"></th>
+<th style="width:39%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px;font-family:'JetBrains Mono', monospace">NLTK</th>
+<th style="width:39%;text-align:left;color:#22d3ee;font-weight:700;padding:18px 20px;font-family:'JetBrains Mono', monospace">spaCy</th>
+</tr>
+<tr style="background:#0a0f1c">
+<td style="padding:18px 20px;color:#8ea0bb">Enfoque</td>
+<td style="padding:18px 20px">Educativo, muy flexible</td>
+<td style="padding:18px 20px">Producción, rápido y opinado</td>
+</tr>
+<tr style="background:#0d1526">
+<td style="padding:18px 20px;color:#8ea0bb">Velocidad</td>
+<td style="padding:18px 20px">Moderada</td>
+<td style="padding:18px 20px">Alta (optimizado en Cython)</td>
+</tr>
+<tr style="background:#0a0f1c">
+<td style="padding:18px 20px;color:#8ea0bb">Modelos</td>
+<td style="padding:18px 20px">Algoritmos clásicos y corpora</td>
+<td style="padding:18px 20px">Pipelines preentrenados por idioma</td>
+</tr>
+<tr style="background:#0d1526">
+<td style="padding:18px 20px;color:#8ea0bb">Ideal para</td>
+<td style="padding:18px 20px">Aprender fundamentos de PLN</td>
+<td style="padding:18px 20px">Proyectos reales y escalables</td>
+</tr>
+</table>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#cbd5e1"><span style="color:#f472b6">import</span> spacy</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#cbd5e1">nlp = spacy.<span style="color:#22d3ee">load</span>(<span style="color:#86efac">"es_core_news_sm"</span>)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#cbd5e1">doc = nlp(<span style="color:#86efac">"El PLN transforma texto en datos"</span>)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#cbd5e1"><span style="color:#f472b6">for</span> token <span style="color:#f472b6">in</span> doc: <span style="color:#f472b6">print</span>(token.text, token.lemma_, token.pos_)</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">12 / 24</p>
+</div>
+<div class="slide" id="mod3-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">03</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 03 // 30 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Representación de texto</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">Cómo convertir palabras en números: Bag of Words, TF-IDF y embeddings vectoriales.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">13 / 24</p>
+</div>
+<div class="slide" id="bow-tfidf" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 03 // REPRESENTACIÓN</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Bag of Words y TF-IDF</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">BAG OF WORDS (BoW)</p>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Conteo de palabras</h3>
+<p style="font-size:21px;color:#8ea0bb;line-height:1.45">Cada documento se representa como un vector con la frecuencia de cada palabra del vocabulario. Ignora el orden y el contexto.</p>
+<div style="background:#0a0f1c;border-radius:10px;padding:18px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#cbd5e1">"el gato ve al gato"</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">→ {"el":2, "gato":2, "ve":1, "al":1}</p>
+</div>
+</div>
+<div style="flex:1;background:#102233;border:1px solid #22d3ee;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">TF-IDF</p>
+<h3 style="font-size:28px;font-weight:600;color:#eef3f8">Frecuencia ponderada</h3>
+<p style="font-size:21px;color:#bfe9f2;line-height:1.45">Pondera cada palabra por su frecuencia en el documento (TF) y penaliza las que aparecen en muchos documentos (IDF).</p>
+<div style="background:#0a0f1c;border-radius:10px;padding:18px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#cbd5e1">TF-IDF = TF(t,d) × log(N / DF(t))</p>
+</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:20px;background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:22px 28px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:30px;height:30px"><path d="M9 18h6M10 22h4M15 16v-2.5a5.5 5.5 0 1 0-6 0V16a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1z"/></svg>
+<p style="font-size:22px;color:#8ea0bb">Palabras como "el" o "de" obtienen un peso bajo; términos poco comunes pero relevantes, como "algoritmo", obtienen un peso alto.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">14 / 24</p>
+
+</div>
+<div class="slide" id="word-embeddings" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 03 // REPRESENTACIÓN</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Word embeddings</h2>
+</div>
+<div style="display:flex;gap:56px">
+<div style="flex:0 0 780px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:26px;line-height:1.5;color:#eef3f8">Los embeddings representan cada palabra como un <b>vector denso</b> donde palabras con significado similar quedan cerca en el espacio.</p>
+<p style="font-size:22px;line-height:1.5;color:#8ea0bb">A diferencia de BoW y TF-IDF, capturan relaciones semánticas: <b>Word2Vec</b> y <b>GloVe</b> entrenan estos vectores a partir de grandes volúmenes de texto.</p>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">LA ANALOGÍA CLÁSICA</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#22d3ee">rey − hombre + mujer ≈ reina</p>
+</div>
+</div>
+<div style="flex:1;position:relative;background:#0d1526;border:1px solid #1c3350;border-radius:18px;padding:32px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872;position:absolute;left:32px;top:28px">ESPACIO VECTORIAL (proyección 2D)</p>
+<div style="position:absolute;left:120px;top:420px;width:620px;height:2px;background:#1c3350"></div>
+<div style="position:absolute;left:120px;top:140px;width:2px;height:280px;background:#1c3350"></div>
+<div style="position:absolute;left:230px;top:200px;width:14px;height:14px;border-radius:50%;background:#22d3ee"></div>
+<p style="position:absolute;left:250px;top:184px;font-family:'JetBrains Mono', monospace;font-size:20px;color:#eef3f8">rey</p>
+<div style="position:absolute;left:290px;top:260px;width:14px;height:14px;border-radius:50%;background:#22d3ee"></div>
+<p style="position:absolute;left:310px;top:244px;font-family:'JetBrains Mono', monospace;font-size:20px;color:#eef3f8">reina</p>
+<div style="position:absolute;left:470px;top:300px;width:14px;height:14px;border-radius:50%;background:#a78bfa"></div>
+<p style="position:absolute;left:490px;top:284px;font-family:'JetBrains Mono', monospace;font-size:20px;color:#eef3f8">hombre</p>
+<div style="position:absolute;left:520px;top:360px;width:14px;height:14px;border-radius:50%;background:#a78bfa"></div>
+<p style="position:absolute;left:540px;top:344px;font-family:'JetBrains Mono', monospace;font-size:20px;color:#eef3f8">mujer</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">15 / 24</p>
+
+</div>
+<div class="slide" id="mod4-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">04</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 04 // 20 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Modelos y tareas clásicas</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">Clasificación de texto, análisis de sentimiento y reconocimiento de entidades.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">16 / 24</p>
+</div>
+<div class="slide" id="clasificacion-sentimiento-ner" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 04 // MODELOS CLÁSICOS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Clasificación, sentimiento y NER</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Clasificación de texto</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Asignar una categoría a un documento: spam/no spam, tema, urgencia. Naive Bayes y Regresión Logística son puntos de partida clásicos sobre TF-IDF.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.3a2 2 0 0 0 2-1.7l1.4-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Análisis de sentimiento</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Caso particular de clasificación: positivo, negativo o neutro. Útil para reseñas, redes sociales y soporte al cliente.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:32px;height:32px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">NER</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.4">Named Entity Recognition: detecta personas, lugares, organizaciones y fechas dentro del texto.</p>
+</div>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">EJEMPLO — NER CON spaCy</p>
+<p style="font-size:24px;color:#eef3f8;line-height:1.6">"<span style="color:#22d3ee">David</span> viajó a <span style="color:#a78bfa">Ciudad de México</span> el <span style="color:#86efac">3 de octubre</span> para trabajar en <span style="color:#22d3ee">CODEXSOTO</span>."</p>
+<p style="font-size:19px;color:#8ea0bb">PERSONA · LUGAR · FECHA · ORGANIZACIÓN</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">17 / 24</p>
+</div>
+<div class="slide" id="mod5-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">05</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 05 // 40 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Transformers y LLMs</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">La arquitectura detrás de BERT y GPT, y cómo usarla hoy con Hugging Face.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">18 / 24</p>
+</div>
+<div class="slide" id="arquitectura-transformer" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 05 // TRANSFORMERS Y LLMS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">El mecanismo de atención</h2>
+</div>
+<div style="display:flex;gap:56px">
+<div style="flex:0 0 820px;display:flex;flex-direction:column;gap:22px">
+<p style="font-size:25px;line-height:1.5;color:#eef3f8">El <b>self-attention</b> permite que cada palabra "mire" a todas las demás palabras de la oración y decida cuáles son relevantes para interpretarla.</p>
+<p style="font-size:22px;line-height:1.5;color:#8ea0bb">Así, el modelo resuelve ambigüedades usando el contexto completo, no solo las palabras vecinas.</p>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">¿A QUÉ LE PRESTA ATENCIÓN "ESTABA"?</p>
+<p style="font-size:26px;line-height:1.7;color:#8ea0bb">El <span style="color:#eef3f8;font-weight:600">animal</span> no cruzó la calle porque <span style="color:#22d3ee;font-weight:700">estaba</span> cansado</p>
+<p style="font-size:19px;color:#8ea0bb">El modelo conecta "estaba" con "animal", no con "calle", gracias al contexto.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px">
+<div style="width:100%;background:#0d1526;border:1px solid #1c3350;border-radius:12px;padding:16px;text-align:center"><p style="font-size:20px;color:#8ea0bb;text-align:center">Embeddings + posición</p></div>
+<div style="width:24px;height:40px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8595;</div>
+<div style="width:100%;background:#102233;border:1px solid #22d3ee;border-radius:12px;padding:16px;text-align:center"><p style="font-size:20px;color:#eef3f8;text-align:center;font-weight:600">Self-Attention (multi-head)</p></div>
+<div style="width:24px;height:40px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8595;</div>
+<div style="width:100%;background:#0d1526;border:1px solid #1c3350;border-radius:12px;padding:16px;text-align:center"><p style="font-size:20px;color:#8ea0bb;text-align:center">Add &amp; Norm</p></div>
+<div style="width:24px;height:40px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8595;</div>
+<div style="width:100%;background:#0d1526;border:1px solid #1c3350;border-radius:12px;padding:16px;text-align:center"><p style="font-size:20px;color:#8ea0bb;text-align:center">Feed Forward</p></div>
+<div style="width:24px;height:40px;color:#22d3ee;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">&#8595;</div>
+<div style="width:100%;background:#0d1526;border:1px solid #1c3350;border-radius:12px;padding:16px;text-align:center"><p style="font-size:20px;color:#8ea0bb;text-align:center">× N bloques → salida</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">19 / 24</p>
+</div>
+<div class="slide" id="bert-gpt-huggingface" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 05 // TRANSFORMERS Y LLMS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">BERT, GPT y Hugging Face</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">BERT</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Codificador bidireccional</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.45">Lee el contexto completo (izquierda y derecha) a la vez. Ideal para <b>entender</b>: clasificación, NER, búsqueda semántica.</p>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#22d3ee">GPT</p>
+<h3 style="font-size:26px;font-weight:600;color:#eef3f8">Decodificador autorregresivo</h3>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.45">Predice la siguiente palabra usando solo el contexto previo. Ideal para <b>generar</b>: texto, código, conversación.</p>
+</div>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:18px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #1c3350">
+<div style="display:flex;gap:10px">
+<div style="width:12px;height:12px;border-radius:50%;background:#f87171"></div>
+<div style="width:12px;height:12px;border-radius:50%;background:#fbbf24"></div>
+<div style="width:12px;height:12px;border-radius:50%;background:#34d399"></div>
+</div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:16px;color:#4b5872">huggingface_demo.py</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 26px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1"><span style="color:#f472b6">from</span> transformers <span style="color:#f472b6">import</span> <span style="color:#22d3ee">pipeline</span></p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1">clasificador = <span style="color:#22d3ee">pipeline</span>(<span style="color:#86efac">"sentiment-analysis"</span>)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#cbd5e1">resultado = clasificador(<span style="color:#86efac">"¡Este curso de PLN está increíble!"</span>)</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:19px;color:#4b5872"># [{'label': 'POSITIVE', 'score': 0.998}]</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">20 / 24</p>
+
+</div>
+<div class="slide" id="fine-tuning-llms" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 05 // TRANSFORMERS Y LLMS</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Fine-tuning de modelos</h2>
+</div>
+<div style="display:flex;gap:56px">
+<div style="flex:0 0 780px;display:flex;flex-direction:column;gap:22px">
+<p style="font-size:25px;line-height:1.5;color:#eef3f8">El <b>fine-tuning</b> toma un modelo ya preentrenado en grandes volúmenes de texto y ajusta sus pesos con un dataset específico para una tarea concreta.</p>
+<p style="font-size:21px;line-height:1.5;color:#8ea0bb">Es más rápido y requiere muchos menos datos que entrenar un modelo desde cero.</p>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872">¿PROMPTING O FINE-TUNING?</p>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.5"><b style="color:#eef3f8">Prompting / few-shot</b> — rápido, sin entrenar, bueno para empezar.</p>
+<p style="font-size:20px;color:#8ea0bb;line-height:1.5"><b style="color:#eef3f8">Fine-tuning</b> — cuando necesitas precisión, formato fijo o dominio muy específico.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:48px;height:48px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:20px;font-weight:700;color:#22d3ee">1</p></div>
+<p style="font-size:22px;color:#eef3f8">Cargar un modelo base preentrenado</p>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:48px;height:48px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:20px;font-weight:700;color:#22d3ee">2</p></div>
+<p style="font-size:22px;color:#eef3f8">Preparar un dataset etiquetado de la tarea</p>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:48px;height:48px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:20px;font-weight:700;color:#22d3ee">3</p></div>
+<p style="font-size:22px;color:#eef3f8">Entrenar pocas épocas con learning rate bajo</p>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:48px;height:48px;border-radius:50%;background:#0d1526;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:20px;font-weight:700;color:#22d3ee">4</p></div>
+<p style="font-size:22px;color:#eef3f8">Evaluar con métricas de la tarea</p>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:48px;height:48px;border-radius:50%;background:#102233;border:1px solid #22d3ee;display:flex;align-items:center;justify-content:center"><p style="font-family:'JetBrains Mono', monospace;font-size:20px;font-weight:700;color:#22d3ee">5</p></div>
+<p style="font-size:22px;color:#eef3f8">Desplegar el modelo ajustado</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">21 / 24</p>
+</div>
+<div class="slide" id="mod6-divider" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:28px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 15% 50%, rgba(34,211,238,0.12), rgba(7,11,20,0) 55%)"></div>
+<p style="position:absolute;left:90px;top:40px;font-family:'JetBrains Mono', monospace;font-size:380px;font-weight:700;color:#101b2c">06</p>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:22px;color:#22d3ee;letter-spacing:3px">MÓDULO 06 // 30 MIN</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:96px;font-weight:700;color:#eef3f8;line-height:1.05">Práctica y cierre</h1>
+<p style="font-size:30px;color:#8ea0bb;width:1100px;line-height:1.5">Un proyecto end-to-end, el mapa de notebooks del curso y los siguientes pasos.</p>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">22 / 24</p>
+</div>
+<div class="slide" id="mapa-notebooks" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">MÓDULO 06 // PRÁCTICA</p>
+</div>
+<h2 style="font-family:'Space Grotesk', sans-serif;font-size:56px;font-weight:700;color:#eef3f8">Mapa de notebooks del curso</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:22px">
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">00_introduccion_pln.ipynb</p>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Exploración de texto y primer contacto con NLTK/spaCy</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">01_preprocesamiento.ipynb</p>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Normalización, tokenización, stopwords, lematización</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">02_representacion_texto.ipynb</p>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">BoW, TF-IDF y embeddings con Word2Vec</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">03_modelos_clasicos.ipynb</p>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Clasificación de texto, sentimiento y NER</p>
+</div>
+<div style="background:#0d1526;border:1px solid #1c3350;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">04_transformers_huggingface.ipynb</p>
+<p style="font-size:19px;color:#8ea0bb;line-height:1.4">Pipelines de Hugging Face y fine-tuning</p>
+</div>
+<div style="background:#102233;border:1px solid #22d3ee;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:28px;height:28px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:17px;color:#22d3ee">05_proyecto_final.ipynb</p>
+<p style="font-size:19px;color:#bfe9f2;line-height:1.4">Proyecto end-to-end: clasificador de reseñas</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">23 / 24</p>
+
+</div>
+<div class="slide" id="recursos-cierre" style="background:#070b14;color:#eef3f8;font-family:'Inter', sans-serif;padding:128px;display:flex;flex-direction:row;align-items:center;gap:80px">
+<div style="position:absolute;left:0px;top:0px;width:1920px;height:1080px;background:radial-gradient(circle at 80% 70%, rgba(34,211,238,0.14), rgba(7,11,20,0) 55%)"></div>
+<div style="flex:0 0 880px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:10px;height:10px;border-radius:50%;background:#22d3ee"></div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#22d3ee;letter-spacing:2px">FIN DEL CURSO</p>
+</div>
+<h1 style="font-family:'Space Grotesk', sans-serif;font-size:80px;font-weight:700;color:#eef3f8;line-height:1.05">Gracias por tu tiempo</h1>
+<p style="font-size:26px;line-height:1.5;color:#8ea0bb">Sigue practicando con los notebooks del curso: cada módulo tiene su propio ejercicio guiado.</p>
+<div style="display:flex;align-items:center;gap:12px;background:#0d1526;border:1px solid #1c3350;border-radius:999px;padding:14px 26px;align-self:flex-start">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:22px;height:22px"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+<p style="font-family:'JetBrains Mono', monospace;font-size:20px;color:#8ea0bb">CODEXSOTO // David Soto</p>
+</div>
+</div>
+<div style="flex:1;background:#0d1526;border:1px solid #1c3350;border-radius:18px;padding:40px;display:flex;flex-direction:column;gap:22px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:18px;color:#4b5872;letter-spacing:1px">RECURSOS PARA SEGUIR APRENDIENDO</p>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:26px;height:26px"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+<p style="font-size:23px;color:#eef3f8">Hugging Face NLP Course</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:26px;height:26px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<p style="font-size:23px;color:#eef3f8">Jurafsky &amp; Martin — Speech and Language Processing</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:26px;height:26px"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+<p style="font-size:23px;color:#eef3f8">Documentación oficial de spaCy y NLTK</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:26px;height:26px"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+<p style="font-size:23px;color:#eef3f8">Datasets y competencias de PLN en Kaggle</p>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pln-ic" style="color:#22d3ee;width:26px;height:26px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+<p style="font-size:23px;color:#eef3f8">Comunidad de Hugging Face y Discord de PLN en español</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872;letter-spacing:1px">PLN · CODEXSOTO</p>
+<p style="position:absolute;right:128px;bottom:64px;font-size:20px;font-family:'JetBrains Mono', monospace;color:#4b5872">24 / 24</p>
+</div>
+  </div>
+</div>
+
+<div id="hud-bottom">
+  <div class="side">
+    <a id="homebtn" class="nbtn" href="/">&#8962; Inicio</a>
+    <button class="nbtn" id="idxbtn" title="Indice (tecla I)">&#9776; Indice</button>
+  </div>
+  <div class="side">
+    <span id="counter">01 / 24</span>
+  </div>
+  <div class="side">
+    <button class="nbtn" id="prevbtn">&larr; Anterior</button>
+    <button class="nbtn" id="nextbtn">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<div id="idx-overlay">
+  <div id="idx-panel">
+    <h2>Modulos del curso</h2>
+    <div id="idx-list"></div>
+    <button id="idx-close">cerrar (esc)</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var current = 0;
+
+  var MODULES = [
+    { id: 'cover', label: 'Portada' },
+    { id: 'mod1-divider', label: 'Modulo 1 — Fundamentos del PLN' },
+    { id: 'mod2-divider', label: 'Modulo 2 — Preprocesamiento de texto' },
+    { id: 'mod3-divider', label: 'Modulo 3 — Representacion de texto' },
+    { id: 'mod4-divider', label: 'Modulo 4 — Modelos y tareas clasicas' },
+    { id: 'mod5-divider', label: 'Modulo 5 — Transformers y LLMs' },
+    { id: 'mod6-divider', label: 'Modulo 6 — Practica y cierre' }
+  ];
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  function render() {
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].classList.toggle('active', i === current);
+    }
+    document.getElementById('progress').style.width = (((current + 1) / total) * 100) + '%';
+    var n = String(current + 1).padStart(2, '0');
+    var t = String(total).padStart(2, '0');
+    document.getElementById('counter').textContent = n + ' / ' + t;
+    document.getElementById('prevbtn').disabled = current === 0;
+    document.getElementById('nextbtn').disabled = current === total - 1;
+    history.replaceState(null, '', '#' + slides[current].id);
+  }
+
+  function goTo(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    current = i;
+    render();
+  }
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.getElementById('nextbtn').addEventListener('click', next);
+  document.getElementById('prevbtn').addEventListener('click', prev);
+
+  var idxOverlay = document.getElementById('idx-overlay');
+  var idxList = document.getElementById('idx-list');
+  MODULES.forEach(function(m) {
+    var idx = slides.findIndex(function(s) { return s.id === m.id; });
+    if (idx === -1) return;
+    var item = document.createElement('button');
+    item.className = 'idx-item';
+    item.innerHTML = '<span class="n">' + String(idx + 1).padStart(2, '0') + '</span><b>' + m.label + '</b>';
+    item.addEventListener('click', function() { goTo(idx); closeIdx(); });
+    idxList.appendChild(item);
+  });
+  function openIdx() { idxOverlay.classList.add('open'); }
+  function closeIdx() { idxOverlay.classList.remove('open'); }
+  document.getElementById('idxbtn').addEventListener('click', openIdx);
+  document.getElementById('idx-close').addEventListener('click', closeIdx);
+  idxOverlay.addEventListener('click', function(e) { if (e.target === idxOverlay) closeIdx(); });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    else if (e.key === 'i' || e.key === 'I') { idxOverlay.classList.contains('open') ? closeIdx() : openIdx(); }
+    else if (e.key === 'Escape') { closeIdx(); }
+  });
+
+  // Swipe tactil basico
+  var touchX = null;
+  document.addEventListener('touchstart', function(e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    touchX = null;
+  }, { passive: true });
+
+  // Deep link por hash (#slide-id)
+  var startHash = location.hash.replace('#', '');
+  var startIdx = slides.findIndex(function(s) { return s.id === startHash; });
+  current = startIdx >= 0 ? startIdx : 0;
+  render();
+})();
+</script>
+</body>
+</html>

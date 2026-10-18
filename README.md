@@ -11,6 +11,7 @@ App interactiva para la conferencia **Agentes de IA 2026**: el público escanea 
 | `/` | Público (QR) | Votaciones, preguntas y registro |
 | `/deck?token=TU_TOKEN` | Tú, en el proyector | La presentación (42 slides); controla los celulares y muestra resultados en vivo |
 | `/admin` | Tú | Panel: cambiar dinámica, revelar respuestas, moderar preguntas, descargar registros CSV |
+| `/deck-pln` | Público | Curso de PLN: presentación interactiva de solo navegación (sin votaciones ni backend) |
 | `/roadmap` | Estudiantes y developers | **Guía de aprendizaje:** 6 meses, certificaciones cloud (AWS/Azure/GCP) y ágiles (CSD, CSM) |
 | `/healthz` | Dokploy | Chequeo de salud |
 
