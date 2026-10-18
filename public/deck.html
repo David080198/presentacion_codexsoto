@@ -949,7 +949,7 @@ mensajes = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span
     </div>
   </section>
 
-  <div class="hud-bottom"><button class="navb" id="bPrev" type="button" aria-label="Anterior">‹</button><div class="progress"><i id="prog"></i></div><span class="counter" id="ctr">1 / 42</span><button class="navb" id="bNext" type="button" aria-label="Siguiente">›</button></div>
+  <div class="hud-bottom"><button class="navb" id="bPrev" type="button" aria-label="Anterior">‹</button><div class="progress"><i id="prog"></i></div><span class="counter" id="ctr">1 / 42</span><button class="navb" id="bHome" type="button" aria-label="Ir al inicio" title="Ir al inicio (tecla Home)">⌂</button><button class="navb" id="bNext" type="button" aria-label="Siguiente">›</button></div>
 </div>
 </div>
 <aside id="notes" hidden><div class="nh"><b id="nTimer">00:00</b><span id="nSlide"></span><span>T reinicia el reloj · N oculta</span></div><div id="nBody"></div></aside>
@@ -1039,7 +1039,7 @@ function prev(){const s=slides[cur];
   if(H[s.id]&&H[s.id].prev&&H[s.id].prev(s))return;
   const on=$$('.step.on',s);if(on.length){on[on.length-1].classList.remove('on');return}
   go(cur-1,true)}
-$('#bNext').onclick=next;$('#bPrev').onclick=prev;
+$('#bNext').onclick=next;$('#bPrev').onclick=prev;$('#bHome').onclick=()=>go(0);
 addEventListener('keydown',e=>{
   const tg=e.target.tagName;
   if(tg==='INPUT'||tg==='TEXTAREA'){if(e.key==='Escape')e.target.blur();return}

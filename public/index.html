@@ -127,6 +127,7 @@ body.has-presenter-token nav{display:none}
 </nav>
 <div class="nav-controls" id="navControls">
   <button id="prevBtn" type="button">◄ Anterior</button>
+  <button id="homeBtn" type="button" title="Ir al inicio">⌂ Inicio</button>
   <span class="slide-info" id="slideInfo">Slide 1 / 46</span>
   <button id="nextBtn" type="button">Siguiente ►</button>
 </div>
@@ -221,6 +222,7 @@ function updateSlideControls() {
   $('#navControls').classList.add('active');
   $('#prevBtn').disabled = S.currentSlide <= 0;
   $('#nextBtn').disabled = S.currentSlide >= 45;
+  $('#homeBtn').disabled = false;
   $('#slideInfo').textContent = 'Slide ' + (S.currentSlide + 1) + ' / 46';
 }
 if (isPresentador) {
@@ -228,6 +230,7 @@ if (isPresentador) {
   $('#navControls').classList.add('active');
   $('#prevBtn').onclick = () => navigate('prev');
   $('#nextBtn').onclick = () => navigate('next');
+  $('#homeBtn').onclick = () => navigate('reset');
 }
 
 renderLive();
