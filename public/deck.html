@@ -229,6 +229,15 @@ input[type=range]{accent-color:var(--cyan);width:100%}
 .stack::after{content:"× N capas";position:absolute;right:-130px;top:50%;transform:translateY(-50%);font-family:var(--f-mono);font-size:24px;color:var(--amber)}
 .pulse{position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 20px var(--cyan),0 0 40px var(--cyan);animation:pulseUp 3.2s linear infinite;pointer-events:none;bottom:0;z-index:3}
 @keyframes pulseUp{from{bottom:0;opacity:0}8%{opacity:1}92%{opacity:1}to{bottom:100%;opacity:0}}
+.archTrack{position:relative;display:flex;justify-content:space-between;align-items:center;height:16px;margin-top:22px}
+.archTrack::before{content:"";position:absolute;left:7px;right:7px;top:50%;height:2px;background:var(--line2);transform:translateY(-50%)}
+.archTrack i{position:relative;width:14px;height:14px;border-radius:50%;background:#0b1626;border:2px solid var(--line2);transition:background .25s,border-color .25s,box-shadow .25s}
+.archTrack i.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px var(--cyan),0 0 26px var(--cyan);animation:archNode .5s ease}
+@keyframes archNode{0%{transform:scale(.4)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+.archEx-wrap{position:relative;overflow:hidden;border-left:2px solid var(--cyan)}
+.archEx-wrap::after{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(38,224,255,.35),transparent);transform:translateX(-100%);pointer-events:none}
+.archEx-wrap.scan::after{animation:archScan .45s ease}
+@keyframes archScan{to{transform:translateX(100%)}}
 
 /* Barras de probabilidad */
 .bars{display:flex;flex-direction:column;gap:10px}
@@ -549,7 +558,8 @@ jugando llamarán.</blockquote><span class="src">Gustavo Adolfo Bécquer · Rima
         <h3 id="archT" class="cy" style="font-size:40px;margin:10px 0 16px">Toca un bloque</h3>
         <p id="archD" style="font-size:28px;color:var(--ink)">Recorre la red de abajo hacia arriba, como lo hace cada token.</p>
         <div class="mono small mu" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">Ejemplo en vivo · «El gato se sentó»</div>
-        <pre class="mono" id="archEx" style="margin-top:10px;font-size:22px;line-height:1.5;color:var(--ink);white-space:pre-wrap">—</pre>
+        <div class="archTrack" id="archTrack"><i data-i="0"></i><i data-i="1"></i><i data-i="2"></i><i data-i="3"></i><i data-i="4"></i><i data-i="5"></i><i data-i="6"></i><i data-i="7"></i></div>
+        <div class="archEx-wrap" id="archExWrap" style="margin-top:14px;padding:14px 16px;background:rgba(8,17,29,.6);border-radius:3px"><pre class="mono" id="archEx" style="font-size:22px;line-height:1.5;color:var(--ink);white-space:pre-wrap;margin:0">—</pre></div>
       </div>
     </div>
   </section>
@@ -1290,9 +1300,22 @@ const ARCHEX=['"El gato se sentó" → tokens [464, 2415, 1058, 9474]',
  'otra conexión residual. Este bloque (pasos 3→6) se repite ×N capas: GPT-3 tiene 96',
  'vector[768] → proyecta a 50 257 puntajes, uno por cada token posible del vocabulario',
  'puntajes → probabilidades: " en" 61%  " ahí" 9%  " afuera" 4% … → se elige " en"'];
-let archI=-1;const blks=$$('#arch .blk');
-function setArch(i){archI=i;blks.forEach(b=>b.classList.toggle('on',+b.dataset.i===i));if(i<0){$('#archK').textContent='Bloque';$('#archT').textContent='Toca un bloque';$('#archD').textContent='Recorre la red de abajo hacia arriba, como lo hace cada token.';$('#archEx').textContent='Elige un bloque para ver cómo cambian los datos de este ejemplo.';return}
-  $('#archK').textContent=ARCH[i][0];$('#archT').textContent=ARCH[i][1];$('#archD').textContent=ARCH[i][2];$('#archEx').textContent=ARCHEX[i]}
+let archI=-1;const blks=$$('#arch .blk');const archNodes=$$('#archTrack i');
+let archRaf=0;
+function scrambleArch(text){
+  cancelAnimationFrame(archRaf);
+  const el=$('#archEx'),chars='01⎍⌁∴⋄#%&';const len=text.length,dur=380,start=performance.now();
+  $('#archExWrap').classList.remove('scan');void $('#archExWrap').offsetWidth;$('#archExWrap').classList.add('scan');
+  function frame(t){const p=Math.min(1,(t-start)/dur);let out='';
+    for(let i=0;i<len;i++){const c=text[i];if(c===' '){out+=' ';continue}
+      out+=(i<p*len*1.2-6)?c:chars[(Math.random()*chars.length)|0]}
+    el.textContent=out;if(p<1)archRaf=requestAnimationFrame(frame);else el.textContent=text}
+  archRaf=requestAnimationFrame(frame)
+}
+function setArch(i){archI=i;blks.forEach(b=>b.classList.toggle('on',+b.dataset.i===i));
+  archNodes.forEach(n=>n.classList.toggle('on',+n.dataset.i<=i));
+  if(i<0){$('#archK').textContent='Bloque';$('#archT').textContent='Toca un bloque';$('#archD').textContent='Recorre la red de abajo hacia arriba, como lo hace cada token.';scrambleArch('Elige un bloque para ver cómo cambian los datos de este ejemplo.');return}
+  $('#archK').textContent=ARCH[i][0];$('#archT').textContent=ARCH[i][1];$('#archD').textContent=ARCH[i][2];scrambleArch(ARCHEX[i])}
 blks.forEach(b=>b.onclick=()=>setArch(+b.dataset.i));
 H['s-arch']={enter(s,back){setArch(back?7:-1)},next(){if(archI<7){setArch(archI+1);return true}return false},prev(){if(archI>-1){setArch(archI-1);return true}return false}};
 
