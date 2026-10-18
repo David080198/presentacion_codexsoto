@@ -548,6 +548,8 @@ jugando llamarán.</blockquote><span class="src">Gustavo Adolfo Bécquer · Rima
         <div class="clab" id="archK">Bloque</div>
         <h3 id="archT" class="cy" style="font-size:40px;margin:10px 0 16px">Toca un bloque</h3>
         <p id="archD" style="font-size:28px;color:var(--ink)">Recorre la red de abajo hacia arriba, como lo hace cada token.</p>
+        <div class="mono small mu" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">Ejemplo en vivo · «El gato se sentó»</div>
+        <pre class="mono" id="archEx" style="margin-top:10px;font-size:22px;line-height:1.5;color:var(--ink);white-space:pre-wrap">—</pre>
       </div>
     </div>
   </section>
@@ -1280,9 +1282,17 @@ const ARCH=[['Entrada','Tokens de entrada','El texto ya convertido en IDs de tok
  ['Estabilidad','Suma + normalización','Otra conexión residual. Este bloque completo se repite N veces: GPT-3 tiene 96 capas.'],
  ['Salida','Capa lineal','Proyecta el vector final al tamaño del vocabulario: un puntaje por cada token posible (decenas de miles).'],
  ['Decisión','Softmax','Convierte los puntajes en probabilidades. Se elige el siguiente token, se agrega al texto y todo se repite.']];
+const ARCHEX=['"El gato se sentó" → tokens [464, 2415, 1058, 9474]',
+ 'id 2415 ("gato") → vector[768] ≈ [0.12, -0.45, 0.33, …] + huella de posición 2',
+ '"sentó" mira hacia atrás → El:0.05  gato:0.63  se:0.32 → decide que quien se sentó es "gato"',
+ 'salida = atención + entrada_original, luego normalizada (media≈0, varianza≈1)',
+ 'vector[768] → expande a 3072 → no linealidad (GELU) → vuelve a comprimirse a 768',
+ 'otra conexión residual. Este bloque (pasos 3→6) se repite ×N capas: GPT-3 tiene 96',
+ 'vector[768] → proyecta a 50 257 puntajes, uno por cada token posible del vocabulario',
+ 'puntajes → probabilidades: " en" 61%  " ahí" 9%  " afuera" 4% … → se elige " en"'];
 let archI=-1;const blks=$$('#arch .blk');
-function setArch(i){archI=i;blks.forEach(b=>b.classList.toggle('on',+b.dataset.i===i));if(i<0){$('#archK').textContent='Bloque';$('#archT').textContent='Toca un bloque';$('#archD').textContent='Recorre la red de abajo hacia arriba, como lo hace cada token.';return}
-  $('#archK').textContent=ARCH[i][0];$('#archT').textContent=ARCH[i][1];$('#archD').textContent=ARCH[i][2]}
+function setArch(i){archI=i;blks.forEach(b=>b.classList.toggle('on',+b.dataset.i===i));if(i<0){$('#archK').textContent='Bloque';$('#archT').textContent='Toca un bloque';$('#archD').textContent='Recorre la red de abajo hacia arriba, como lo hace cada token.';$('#archEx').textContent='Elige un bloque para ver cómo cambian los datos de este ejemplo.';return}
+  $('#archK').textContent=ARCH[i][0];$('#archT').textContent=ARCH[i][1];$('#archD').textContent=ARCH[i][2];$('#archEx').textContent=ARCHEX[i]}
 blks.forEach(b=>b.onclick=()=>setArch(+b.dataset.i));
 H['s-arch']={enter(s,back){setArch(back?7:-1)},next(){if(archI<7){setArch(archI+1);return true}return false},prev(){if(archI>-1){setArch(archI-1);return true}return false}};
 
