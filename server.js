@@ -14,7 +14,7 @@ const EVENT_NAME = process.env.EVENT_NAME || 'Agentes de IA 2026';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 // Debe coincidir con el número de <section class="slide"> en public/deck.html
-const TOTAL_SLIDES = 49;
+const TOTAL_SLIDES = 50;
 
 if (ADMIN_TOKEN.length < 12) {
   console.warn('[aviso] ADMIN_TOKEN no está definido o tiene menos de 12 caracteres: el panel de control y el modo presentador quedan deshabilitados.');
