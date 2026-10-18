@@ -224,14 +224,7 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
   save(); broadcast();
   res.json({ ok: true });
 });
-app.post('/api/navigate', (req, res) => {
-  // Permitir sin autenticación si no hay ADMIN_TOKEN, o validar token si está configurado
-  if (ADMIN_TOKEN.length >= 12) {
-    const t = String(req.get('x-admin-token') || '');
-    if (!t.length || !crypto.timingSafeEqual(Buffer.from(t), Buffer.from(ADMIN_TOKEN))) {
-      return res.status(401).json({ error: 'Token de administrador inválido.' });
-    }
-  }
+app.post('/api/navigate', rateLimit(60, 60000), (req, res) => {
   const { command, slide } = req.body || {};
   const totalSlides = 46;
   if (command === 'next' && db.currentSlide < totalSlides - 1) db.currentSlide++;

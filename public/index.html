@@ -209,12 +209,12 @@ let hasToken = isPresentador;
 async function navigate(cmd, slide) {
   if (!hasToken) return;
   try {
-    const token = isPresentador ? 'presenter' : '';
-    await fetch('/api/navigate', {
+    const r = await fetch('/api/navigate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ command: cmd, slide })
     });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || 'No se pudo avanzar.'); }
   } catch (e) { toast(e.message); }
 }
 function updateSlideControls() {

@@ -1420,6 +1420,7 @@ H['s-end']={enter(){if(qrDone)return;qrDone=true;const el=$('#qr');try{new QRCod
 /* ---------- Inicio ---------- */
 let start=0;try{const m=location.hash.match(/^#(\d+)$/);if(m)start=Math.min(slides.length-1,Math.max(0,+m[1]-1))}catch(e){}
 cur=start;go(start);
+window.__goToSlide=go;
 })();
 </script>
 <script>
@@ -1448,8 +1449,9 @@ function render(){if(!st)return;
   const qs=st.questions.filter(q=>!q.answered).slice(0,6);
   if(qs.length)$('#qaList').innerHTML=qs.map(q=>'<div class="qa-i"><b>▲ '+q.votes+'</b><p>'+esc(q.text)+'</p></div>').join('')}
 let lastSlide=-1;
-function connect(){const es=new EventSource('/events?role=deck');es.onmessage=e=>{try{st=JSON.parse(e.data);if(st.currentSlide!==lastSlide){lastSlide=st.currentSlide;go(st.currentSlide)}render()}catch(x){}}}
-fetch('/api/state',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(s=>{if(!s||!s.counts)throw 0;live=true;document.documentElement.classList.add('live');st=s;lastSlide=st.currentSlide;setup();render();connect();
+function syncSlide(n){if(typeof n!=='number'||n===lastSlide)return;lastSlide=n;if(window.__goToSlide)window.__goToSlide(n)}
+function connect(){const es=new EventSource('/events?role=deck');es.onmessage=e=>{try{st=JSON.parse(e.data);syncSlide(st.currentSlide);render()}catch(x){}}}
+fetch('/api/state',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(s=>{if(!s||!s.counts)throw 0;live=true;document.documentElement.classList.add('live');st=s;setup();render();syncSlide(st.currentSlide);connect();
   const a=document.querySelector('.slide.active');if(a)window.__liveSlide(a.id)}).catch(()=>setup());
 })();
 </script>
