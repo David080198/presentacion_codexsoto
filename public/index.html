@@ -128,7 +128,7 @@ body.has-presenter-token nav{display:none}
 <div class="nav-controls" id="navControls">
   <button id="prevBtn" type="button">◄ Anterior</button>
   <button id="homeBtn" type="button" title="Ir al inicio">⌂ Inicio</button>
-  <span class="slide-info" id="slideInfo">Slide 1 / 46</span>
+  <span class="slide-info" id="slideInfo">Cargando…</span>
   <button id="nextBtn" type="button">Siguiente ►</button>
 </div>
 <script>
@@ -223,6 +223,7 @@ function connect(){const es=new EventSource('/events');es.onmessage=e=>{try{onSt
   es.onerror=()=>{$('#live').classList.remove('on');$('#liveTxt').textContent='reconectando…'}}
 
 /* Control remoto de presentación (presentador accede a /presentacion) */
+const ACT_LABELS={lobby:'Bienvenida',pills:'Píldoras',real:'¿Humano o IA?',next:'Siguiente palabra',questions:'Preguntas',register:'Registro',reaction:'Reacción',rate:'Escala',level:'Nivel',cloud:'Nube de palabras',feedback:'Comentarios'};
 const isPresentador = window.location.pathname === '/presentacion';
 let hasToken = isPresentador;
 async function navigate(cmd, slide) {
@@ -240,9 +241,10 @@ function updateSlideControls() {
   if (!hasToken || !S) return;
   $('#navControls').classList.add('active');
   $('#prevBtn').disabled = S.currentSlide <= 0;
-  $('#nextBtn').disabled = S.currentSlide >= 45;
+  $('#nextBtn').disabled = S.currentSlide >= (S.totalSlides - 1);
   $('#homeBtn').disabled = false;
-  $('#slideInfo').textContent = 'Slide ' + (S.currentSlide + 1) + ' / 46';
+  const actLabel = ACT_LABELS[S.activity] || S.activity;
+  $('#slideInfo').textContent = 'Slide ' + (S.currentSlide + 1) + ' / ' + S.totalSlides + ' · ' + actLabel;
 }
 if (isPresentador) {
   document.body.classList.add('has-presenter-token');

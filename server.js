@@ -13,6 +13,8 @@ const PRIVACY_URL = process.env.PRIVACY_URL || '';
 const EVENT_NAME = process.env.EVENT_NAME || 'Agentes de IA 2026';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+// Debe coincidir con el número de <section class="slide"> en public/deck.html
+const TOTAL_SLIDES = 49;
 
 if (ADMIN_TOKEN.length < 12) {
   console.warn('[aviso] ADMIN_TOKEN no está definido o tiene menos de 12 caracteres: el panel de control y el modo presentador quedan deshabilitados.');
@@ -74,7 +76,7 @@ function publicState() {
     event: EVENT_NAME, activity: db.activity, counts: counts(), reveal: db.reveal,
     questions: visibleQuestions(), online: [...clients].filter((c) => c.role === 'aud').length,
     platformUrl: PLATFORM_URL, privacyUrl: PRIVACY_URL, interests: INTERESTS, currentSlide: db.currentSlide,
-    slideTitle: db.slideTitle, slideLevel: db.slideLevel, cloud: cloudCounts(),
+    slideTitle: db.slideTitle, slideLevel: db.slideLevel, cloud: cloudCounts(), totalSlides: TOTAL_SLIDES,
   };
 }
 
@@ -264,10 +266,9 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
 });
 app.post('/api/navigate', rateLimit(60, 60000), (req, res) => {
   const { command, slide } = req.body || {};
-  const totalSlides = 46;
-  if (command === 'next' && db.currentSlide < totalSlides - 1) db.currentSlide++;
+  if (command === 'next' && db.currentSlide < TOTAL_SLIDES - 1) db.currentSlide++;
   else if (command === 'prev' && db.currentSlide > 0) db.currentSlide--;
-  else if (command === 'goto' && typeof slide === 'number' && slide >= 0 && slide < totalSlides) db.currentSlide = slide;
+  else if (command === 'goto' && typeof slide === 'number' && slide >= 0 && slide < TOTAL_SLIDES) db.currentSlide = slide;
   else if (command === 'reset') db.currentSlide = 0;
   else { return res.status(400).json({ error: 'Comando inválido.' }); }
   save(); broadcast();

@@ -286,6 +286,14 @@ pre.code{font-family:var(--f-mono);font-size:21px;line-height:1.55;background:rg
     </div>
   </section>
 
+  <!-- 1b · NIVEL DE EXPERIENCIA -->
+  <section class="slide" id="s-level" data-rain="0.15" data-level="Antes de empezar" data-notes="[min 0–1] DINÁMICA rápida mientras terminan de conectarse: pide que voten su nivel desde el celular. Úsalo para calibrar cuánto detenerte en fundamentos.">
+    <div class="eyebrow">Para calibrar la charla</div>
+    <h2 class="t">¿Cuál es tu nivel con IA?</h2>
+    <p class="lead">Vota desde tu celular: así ajusto los ejemplos a la sala.</p>
+    <div class="panel lv-only" style="margin-top:22px"><div class="clab" style="margin-bottom:10px">Lo que vota el público</div><div id="liveLevel" class="col" style="gap:8px"></div></div>
+  </section>
+
   <!-- 2 · BOOT -->
   <section class="slide" id="s-boot" data-rain="1" data-level="Despertar" data-notes="[min 1–2] Arranca con la sala en silencio. «Buenos días. Hoy vamos a ver qué hay detrás de la IA que usan todos los días.» Pide que guarden los celulares 1 segundo… y luego que los saquen: habrá dinámica.">
     <div class="boot-term" id="bootTerm"></div>
@@ -920,6 +928,37 @@ mensajes = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span
     </div>
   </section>
 
+  <!-- 41a-1 · REACCIÓN RÁPIDA -->
+  <section class="slide" id="s-reaction" data-rain="0.1" data-level="Pulso del público" data-notes="[min ~59] DINÁMICA corta: pide una reacción honesta con un emoji antes de pasar a preguntas.">
+    <div class="eyebrow">Antes de las preguntas</div>
+    <h2 class="t">¿Qué te pareció todo esto?</h2>
+    <p class="lead">Toca un emoji desde tu celular.</p>
+    <div class="panel lv-only" style="margin-top:22px"><div class="clab" style="margin-bottom:10px">Reacciones del público</div><div id="liveReaction" class="col" style="gap:8px"></div></div>
+  </section>
+
+  <!-- 41a-2 · ENCUESTA DE CLARIDAD -->
+  <section class="slide" id="s-rate" data-rain="0.1" data-level="Pulso del público" data-notes="[min ~59] Pide que califiquen qué tan clara estuvo la explicación de agentes. Útil para tus próximas charlas.">
+    <div class="eyebrow">Tu opinión cuenta</div>
+    <h2 class="t">¿Qué tan clara estuvo la explicación?</h2>
+    <p class="lead">1 = nada claro · 5 = muy claro. Vota desde tu celular.</p>
+    <div class="panel lv-only" style="margin-top:22px"><div class="clab" style="margin-bottom:10px">Resultado en vivo</div><div id="liveRate" class="col" style="gap:8px"></div></div>
+  </section>
+
+  <!-- 41a-3 · NUBE DE PALABRAS -->
+  <section class="slide" id="s-cloud" data-rain="0.1" data-level="Pulso del público" data-notes="[min ~59] Pide una sola palabra que resuma la charla. Deja que se acumulen unos segundos antes de avanzar.">
+    <div class="eyebrow">Resume la charla</div>
+    <h2 class="t">En una palabra, ¿qué fueron los agentes de IA?</h2>
+    <p class="lead">Escribe una palabra desde tu celular.</p>
+    <div class="panel lv-only" style="margin-top:22px"><div class="clab" style="margin-bottom:10px">Nube de palabras en vivo</div><div id="liveCloud" class="col" style="gap:8px"></div></div>
+  </section>
+
+  <!-- 41a-4 · COMENTARIOS ABIERTOS -->
+  <section class="slide" id="s-feedback" data-rain="0.1" data-level="Pulso del público" data-notes="[min ~60] Mientras preparas la ronda de preguntas, invita a dejar comentarios o dudas que no quieran decir en voz alta. Solo tú los ves, en /admin.">
+    <div class="eyebrow">Para David, en privado</div>
+    <h2 class="t">¿Algo que quieras comentarme?</h2>
+    <p class="lead">Escribe un comentario o duda desde tu celular. No se proyecta: solo yo lo leo.</p>
+  </section>
+
   <!-- 41b · PREGUNTAS -->
   <section class="slide" id="s-qa" data-rain="0.1" data-level="Preguntas" data-notes="[min 60–61] Al entrar a esta lámina, los celulares cambian solos a Preguntas. Responde de arriba hacia abajo: están ordenadas por votos. Desde el panel de control (/admin) puedes marcar una como respondida u ocultar la que no sea apropiada. Cuando termines, avanza al cierre: los celulares pasan al registro.">
     <div class="eyebrow">Desde tu celular</div>
@@ -1429,7 +1468,7 @@ window.__goToSlide=go;
 const LIVE_URL='https://live.codexsoto.com'; // cambia esto si usas otro dominio
 const $=s=>document.querySelector(s);
 const token=new URLSearchParams(location.search).get('token')||'';
-const ACT={'s-join':'lobby','s-pills':'pills','s-real':'real','s-next':'next','s-qa':'questions','s-end':'register'};
+const ACT={'s-join':'lobby','s-level':'level','s-pills':'pills','s-real':'real','s-next':'next','s-reaction':'reaction','s-rate':'rate','s-cloud':'cloud','s-feedback':'feedback','s-qa':'questions','s-end':'register'};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let live=false,st=null;
 function post(u,b){if(!live||!token)return;fetch(u,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':token},body:JSON.stringify(b)}).catch(()=>{})}
@@ -1446,6 +1485,10 @@ function render(){if(!st)return;
   document.querySelectorAll('#quiz .qcard').forEach(c=>{let lv=c.querySelector('.lv');if(!lv){lv=document.createElement('span');lv.className='lv';c.appendChild(lv)}
     const k=st.counts['real'+c.dataset.l]||{h:0,ai:0},tot=k.h+k.ai;lv.innerHTML=tot?'público: <b>'+Math.round(k.h/tot*100)+'%</b> humano · <b>'+Math.round(k.ai/tot*100)+'%</b> IA · '+tot+' votos':'esperando votos…'});
   $('#liveNext').innerHTML=barsHTML(st.counts.next,{},20);
+  $('#liveLevel').innerHTML=barsHTML(st.counts.level,{beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'},20);
+  $('#liveReaction').innerHTML=barsHTML(st.counts.reaction,{},26);
+  $('#liveRate').innerHTML=barsHTML(st.counts.rate,{},20);
+  $('#liveCloud').innerHTML=Object.keys(st.cloud||{}).length?barsHTML(st.cloud,{},20):'<div class="note">esperando palabras…</div>';
   const qs=st.questions.filter(q=>!q.answered).slice(0,6);
   if(qs.length)$('#qaList').innerHTML=qs.map(q=>'<div class="qa-i"><b>▲ '+q.votes+'</b><p>'+esc(q.text)+'</p></div>').join('')}
 let lastSlide=-1;
