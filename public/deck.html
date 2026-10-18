@@ -1008,7 +1008,9 @@ mensajes = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span
       <div class="eyebrow">Sigue preparándote en el</div>
       <h2 class="t" style="text-align:center">Laboratorio de PLN · CIC IPN</h2>
       <div class="panel hud-box" style="width:1240px;max-width:100%;aspect-ratio:16/9;padding:0;overflow:hidden">
-        <video width="100%" height="100%" style="display:block;object-fit:cover" src="/assets/video/cic-ipn.mp4" controls preload="metadata"></video>
+        <video width="100%" height="100%" style="display:block;object-fit:cover" controls preload="metadata">
+          <source src="/assets/video/cic-ipn.mp4" type="video/mp4">
+        </video>
       </div>
       <p class="note">Centro de Investigación en Computación (CIC) · Instituto Politécnico Nacional</p>
     </div>
@@ -1066,6 +1068,7 @@ const H={};
 /* ---------- Escalado ---------- */
 function fit(){const w=innerWidth-32,h=innerHeight-16;stage.style.setProperty('--s',Math.max(.1,Math.min(w/1920,h/1080)))}
 addEventListener('resize',()=>{fit();rs()});fit();
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>{fit();rs()});
 
 /* ---------- Lluvia ---------- */
 const cv=$('#rain'),cx=cv.getContext('2d');let cols=[],fs=20,CW=0,CH=0;
