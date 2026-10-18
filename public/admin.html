@@ -46,10 +46,12 @@ input{font:inherit;background:#02080e;color:var(--ink);border:1px solid var(--li
       <div class="card"><h2>Conectados</h2><div class="big" id="online">0</div><p class="mu">Registros guardados: <b id="regs">0</b></p><a class="lnk" id="csv">Descargar registros (CSV)</a></div>
       <div class="card"><h2>Actividad en los celulares</h2><div class="btns" id="acts"></div><p class="mu">La presentación cambia esto sola al entrar a cada lámina con dinámica.</p></div>
       <div class="card"><h2>Resultados</h2><div class="kv" id="counts"></div></div>
+      <div class="card"><h2>Nube de palabras</h2><div class="kv" id="cloud"></div></div>
       <div class="card"><h2>Revelar ¿humano o máquina?</h2><div class="btns" id="reveals"></div></div>
-      <div class="card"><h2>Reiniciar (antes de empezar)</h2><p class="mu">Pulsa dos veces para confirmar. Nunca borra los registros.</p><div class="btns"><button class="danger" data-reset="votes">Borrar votos</button><button class="danger" data-reset="questions">Borrar preguntas</button><button class="danger" data-reset="live">Reiniciar todo lo en vivo</button></div></div>
+      <div class="card"><h2>Reiniciar (antes de empezar)</h2><p class="mu">Pulsa dos veces para confirmar. Nunca borra los registros.</p><div class="btns"><button class="danger" data-reset="votes">Borrar votos</button><button class="danger" data-reset="questions">Borrar preguntas</button><button class="danger" data-reset="feedback">Borrar comentarios</button><button class="danger" data-reset="live">Reiniciar todo lo en vivo</button></div></div>
     </div>
     <div class="card" style="margin-top:16px"><h2>Preguntas</h2><div id="qs"><p class="mu">Sin preguntas.</p></div></div>
+    <div class="card" style="margin-top:16px"><h2>Comentarios abiertos</h2><div id="fbs"><p class="mu">Sin comentarios.</p></div></div>
   </div>
 </div>
 <script>
@@ -59,18 +61,20 @@ const qs=new URLSearchParams(location.search);
 let token=qs.get('token')||'';try{if(token)sessionStorage.setItem('cx_tk',token);else token=sessionStorage.getItem('cx_tk')||''}catch{}
 if(qs.get('token'))history.replaceState(null,'','/admin');
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ACTS=[['lobby','Bienvenida'],['pills','Píldoras'],['real','¿Humano o IA?'],['next','Siguiente palabra'],['reaction','Reacción rápida'],['rate','Encuesta de escala'],['questions','Preguntas'],['register','Registro']];
+const ACTS=[['lobby','Bienvenida'],['pills','Píldoras'],['real','¿Humano o IA?'],['next','Siguiente palabra'],['reaction','Reacción rápida'],['rate','Encuesta de escala'],['level','Nivel de experiencia'],['cloud','Nube de palabras'],['feedback','Comentarios'],['questions','Preguntas'],['register','Registro']];
 async function call(method,url,body){const r=await fetch(url,{method,headers:{'Content-Type':'application/json','x-admin-token':token},body:body?JSON.stringify(body):undefined});if(r.status===401)throw new Error('auth');return r.json()}
 async function load(){try{const s=await call('GET','/api/admin/state');render(s);$('#login').hidden=true;$('#app').hidden=false}catch(e){if(e.message==='auth'){$('#app').hidden=true;$('#login').hidden=false;if(token)$('#le').textContent='Token incorrecto.'}}}
 function render(s){$('#online').textContent=s.online;$('#regs').textContent=s.registrations;
   $('#acts').innerHTML=ACTS.map(([k,l])=>'<button data-a="'+k+'" class="'+(s.activity===k?'on':'')+'">'+l+'</button>').join('');
   $('#acts').querySelectorAll('button').forEach(b=>b.onclick=()=>call('POST','/api/admin/activity',{activity:b.dataset.a}).then(load));
   $('#counts').innerHTML=Object.entries(s.counts).map(([p,c])=>'<span>'+p+'</span><span>'+Object.entries(c).map(([k,v])=>k+': '+v).join(' · ')+'</span>').join('');
+  $('#cloud').innerHTML=Object.keys(s.cloud||{}).length?Object.entries(s.cloud).map(([w,c])=>'<span>'+esc(w)+'</span><span>'+c+'</span>').join(''):'<span class="mu">Sin palabras aún.</span><span></span>';
   $('#reveals').innerHTML=['A','B','C','D'].map(L=>{const on=!!s.reveal['real'+L];return '<button data-r="real'+L+'" class="'+(on?'on':'')+'">Texto '+L+(on?' ✓':'')+'</button>'}).join('');
   $('#reveals').querySelectorAll('button').forEach(b=>b.onclick=()=>call('POST','/api/admin/reveal',{poll:b.dataset.r,value:!b.classList.contains('on')}).then(load));
   const Q=s.allQuestions.slice().sort((a,b)=>(a.answered-b.answered)||(b.votes-a.votes));
   $('#qs').innerHTML=Q.length?Q.map(q=>'<div class="q'+(q.hidden?' hid':'')+'"><p><b class="mono">▲'+q.votes+'</b> '+esc(q.text)+(q.answered?' <span class="mu">(respondida)</span>':'')+'</p><div class="btns"><button data-id="'+q.id+'" data-k="answered" data-v="'+!q.answered+'">'+(q.answered?'Reabrir':'Respondida')+'</button><button class="danger" data-id="'+q.id+'" data-k="hidden" data-v="'+!q.hidden+'">'+(q.hidden?'Mostrar':'Ocultar')+'</button></div></div>').join(''):'<p class="mu">Sin preguntas.</p>';
-  $('#qs').querySelectorAll('button').forEach(b=>b.onclick=()=>call('POST','/api/admin/questions/'+b.dataset.id,{[b.dataset.k]:b.dataset.v==='true'}).then(load))}
+  $('#qs').querySelectorAll('button').forEach(b=>b.onclick=()=>call('POST','/api/admin/questions/'+b.dataset.id,{[b.dataset.k]:b.dataset.v==='true'}).then(load));
+  $('#fbs').innerHTML=s.allFeedback.length?s.allFeedback.map(f=>'<div class="q"><p>'+esc(f.text)+'</p></div>').join(''):'<p class="mu">Sin comentarios.</p>'}
 document.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>{if(!b.classList.contains('arm')){b.classList.add('arm');b.dataset.t=b.textContent;b.textContent='¿Seguro? Pulsa otra vez';setTimeout(()=>{b.classList.remove('arm');b.textContent=b.dataset.t},3000);return}
   b.classList.remove('arm');b.textContent=b.dataset.t;call('POST','/api/admin/reset',{scope:b.dataset.reset}).then(load)});
 $('#lf').onsubmit=e=>{e.preventDefault();token=$('#tk').value.trim();try{sessionStorage.setItem('cx_tk',token)}catch{}setLinks();load()};

@@ -25,12 +25,13 @@ const POLLS = {
   next: ['cambiar', 'transformar', 'ayudar', 'automatizar', 'reemplazar', 'bailar'],
   reaction: ['👍', '🤔', '😮', '👏', '😴'],
   rate: ['1', '2', '3', '4', '5'],
+  level: ['beginner', 'intermediate', 'advanced'],
 };
-const ACTIVITIES = ['lobby', 'pills', 'real', 'next', 'questions', 'register', 'reaction', 'rate'];
+const ACTIVITIES = ['lobby', 'pills', 'real', 'next', 'questions', 'register', 'reaction', 'rate', 'level', 'cloud', 'feedback'];
 const INTERESTS = ['Agentes de IA', 'Desarrollo web', 'Ciencia de datos', 'Cursos y talleres', 'Proyectos para mi empresa'];
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [], currentSlide: 0, slideTitle: '', slideLevel: '' };
+let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [], currentSlide: 0, slideTitle: '', slideLevel: '', cloud: {}, feedback: [] };
 try { db = { ...db, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }; } catch { /* primer arranque */ }
 
 let saveTimer = null;
@@ -63,12 +64,17 @@ function visibleQuestions() {
     .slice(0, 60)
     .map((q) => ({ id: q.id, text: q.text, votes: q.voters.length, answered: q.answered }));
 }
+function cloudCounts() {
+  const freq = {};
+  for (const w of Object.values(db.cloud)) freq[w] = (freq[w] || 0) + 1;
+  return Object.fromEntries(Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 40));
+}
 function publicState() {
   return {
     event: EVENT_NAME, activity: db.activity, counts: counts(), reveal: db.reveal,
     questions: visibleQuestions(), online: [...clients].filter((c) => c.role === 'aud').length,
     platformUrl: PLATFORM_URL, privacyUrl: PRIVACY_URL, interests: INTERESTS, currentSlide: db.currentSlide,
-    slideTitle: db.slideTitle, slideLevel: db.slideLevel,
+    slideTitle: db.slideTitle, slideLevel: db.slideLevel, cloud: cloudCounts(),
   };
 }
 
@@ -174,6 +180,30 @@ app.post('/api/questions/:id/vote', rateLimit(60, 60000), (req, res) => {
   res.json({ ok: true, voted: i < 0 });
 });
 
+app.post('/api/cloud', rateLimit(30, 60000), (req, res) => {
+  const { cid } = req.body || {};
+  const word = clean(req.body?.word, 24).toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').trim();
+  if (!CID.test(String(cid))) return res.status(400).json({ error: 'Solicitud inválida.' });
+  if (word.length < 2) return res.status(400).json({ error: 'Escribe una palabra válida.' });
+  db.cloud[cid] = word;
+  save(); broadcast();
+  res.json({ ok: true });
+});
+
+const lastFeedback = new Map();
+app.post('/api/feedback', rateLimit(10, 60000), (req, res) => {
+  const { cid } = req.body || {};
+  const text = clean(req.body?.text, 400);
+  if (!CID.test(String(cid))) return res.status(400).json({ error: 'Solicitud inválida.' });
+  if (text.length < 5) return res.status(400).json({ error: 'Escribe un poco más, por favor.' });
+  if (Date.now() - (lastFeedback.get(cid) || 0) < 15000) return res.status(429).json({ error: 'Espera unos segundos antes de enviar otro comentario.' });
+  if (db.feedback.length >= 500) return res.status(429).json({ error: 'Se alcanzó el límite de comentarios.' });
+  lastFeedback.set(cid, Date.now());
+  db.feedback.push({ id: crypto.randomUUID().slice(0, 8), text, ts: Date.now() });
+  save(); broadcast();
+  res.json({ ok: true });
+});
+
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
 app.post('/api/register', rateLimit(6, 60000), (req, res) => {
   const b = req.body || {};
@@ -197,7 +227,7 @@ app.post('/api/register', rateLimit(6, 60000), (req, res) => {
 
 /* ---------- Administración ---------- */
 app.get('/api/admin/state', requireAdmin, (req, res) => {
-  res.json({ ...publicState(), allQuestions: db.questions.map(({ cid, voters, ...q }) => ({ ...q, votes: voters.length })), registrations: db.registrations.length });
+  res.json({ ...publicState(), allQuestions: db.questions.map(({ cid, voters, ...q }) => ({ ...q, votes: voters.length })), registrations: db.registrations.length, allFeedback: db.feedback.slice(-200).reverse() });
 });
 app.post('/api/admin/activity', requireAdmin, (req, res) => {
   const a = req.body?.activity;
@@ -225,8 +255,9 @@ app.post('/api/admin/questions/:id', requireAdmin, (req, res) => {
 });
 app.post('/api/admin/reset', requireAdmin, (req, res) => {
   const scope = req.body?.scope;
-  if (scope === 'votes' || scope === 'live') { db.votes = {}; db.reveal = {}; }
+  if (scope === 'votes' || scope === 'live') { db.votes = {}; db.reveal = {}; db.cloud = {}; }
   if (scope === 'questions' || scope === 'live') db.questions = [];
+  if (scope === 'feedback') db.feedback = [];
   if (scope === 'live') db.activity = 'lobby';
   save(); broadcast();
   res.json({ ok: true });

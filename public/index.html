@@ -147,7 +147,7 @@ function setTab(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.se
   $('#view-live').hidden=t!=='live';$('#view-q').hidden=t!=='q';$('#view-r').hidden=t!=='r';if(t==='q')renderQ();window.scrollTo(0,0);markDots()}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 function markDots(){document.querySelectorAll('nav .dot').forEach(d=>d.remove());if(!S)return;
-  const want=S.activity==='questions'?'q':S.activity==='register'?'r':(['pills','real','next','reaction','rate'].includes(S.activity)?'live':null);
+  const want=S.activity==='questions'?'q':S.activity==='register'?'r':(['pills','real','next','reaction','rate','level','cloud','feedback'].includes(S.activity)?'live':null);
   if(want&&want!==tab){const b=document.querySelector('nav [data-tab="'+want+'"]');const d=document.createElement('span');d.className='dot';b.appendChild(d)}}
 
 /* Vista en vivo */
@@ -161,7 +161,11 @@ const RATES=['1','2','3','4','5'];
 function bars(c,labels,me){const tot=Object.values(c).reduce((a,b)=>a+b,0)||0;return '<div class="bars">'+Object.keys(c).map(k=>{const p=tot?Math.round(c[k]/tot*100):0;return '<div class="bar'+(k===me?' me':'')+'"><span>'+esc(labels[k]||k)+'</span><div class="t"><i style="width:'+p+'%"></i></div><span class="n">'+p+'%</span></div>'}).join('')+'</div><p class="res">'+tot+' votos</p>'}
 async function vote(poll,option){mine[poll]=option;store.set('cx_votes',mine);renderLive();try{await api('/api/vote',{cid,poll,option})}catch(e){toast(e.message)}}
 function renderLive(){const v=$('#view-live');if(!S){v.innerHTML='<div class="card"><div class="wait"><i></i><i></i><i></i> Conectando con la conferencia…</div></div>';return}
-  const a=S.activity;let h='';
+  const a=S.activity;
+  if(v.dataset.act===a&&(a==='cloud'||a==='feedback')&&document.activeElement&&v.contains(document.activeElement)){
+    if(a==='cloud'){const r=$('#cloudResults');if(r)r.innerHTML=Object.keys(S.cloud||{}).length?bars(S.cloud,{},mine.cloud):'<p class="mu">Sé el primero en escribir una palabra.</p>'}
+    return}
+  let h='';
   if(a==='pills'){h='<div><p class="eyebrow">Dinámica 1</p><h1>¿Azul o roja?</h1><p class="mu">Azul: la IA es magia y no preguntas cómo funciona. Roja: vemos qué pasa por dentro.</p></div><div class="card"><div class="pills">'+
     [['blue','Azul'],['red','Roja']].map(([k,l])=>'<button class="pillbtn'+(mine.pills===k?' sel':'')+'" data-v="pills:'+k+'"><span class="pill '+k+'"></span><b>'+l+'</b></button>').join('')+'</div>'+(mine.pills?'<div style="margin-top:16px">'+bars(S.counts.pills,{blue:'Azul',red:'Roja'},mine.pills)+'</div>':'')+'</div>'}
   else if(a==='real'){h='<div><p class="eyebrow">Dinámica 2</p><h1>¿Humano o máquina?</h1><p class="mu">Vota cada texto. La respuesta aparece cuando David la revele.</p></div>'+REAL.map(([L,t,ans,src])=>{const p='real'+L,rev=S.reveal[p],c=S.counts[p],tot=c.h+c.ai;
@@ -175,11 +179,19 @@ function renderLive(){const v=$('#view-live');if(!S){v.innerHTML='<div class="ca
     REACTIONS.map(k=>'<button class="pillbtn'+(mine.reaction===k?' sel':'')+'" data-v="reaction:'+k+'" style="padding:12px 2px;gap:4px"><span style="font-size:30px">'+k+'</span></button>').join('')+'</div>'+(mine.reaction?'<div style="margin-top:16px">'+bars(S.counts.reaction,{},mine.reaction)+'</div>':'')+'</div>'}
   else if(a==='rate'){h='<div><p class="eyebrow">Encuesta rápida</p><h1>'+esc(S.slideTitle||'¿Qué tan claro fue esto?')+'</h1><p class="mu">1 = nada claro · 5 = muy claro</p></div><div class="card"><div class="two" style="grid-template-columns:repeat(5,1fr)">'+
     RATES.map(n=>'<button class="'+(mine.rate===n?'sel':'')+'" data-v="rate:'+n+'">'+n+'</button>').join('')+'</div>'+(mine.rate?'<div style="margin-top:16px">'+bars(S.counts.rate,{},mine.rate)+'</div>':'')+'</div>'}
+  else if(a==='level'){h='<div><p class="eyebrow">Antes de empezar</p><h1>¿Cuál es tu nivel con IA?</h1><p class="mu">Así ajusto los ejemplos a la sala.</p></div><div class="card"><div class="two" style="grid-template-columns:repeat(3,1fr)">'+
+    [['beginner','Principiante'],['intermediate','Intermedio'],['advanced','Avanzado']].map(([k,l])=>'<button class="'+(mine.level===k?'sel':'')+'" data-v="level:'+k+'">'+l+'</button>').join('')+'</div>'+(mine.level?'<div style="margin-top:16px">'+bars(S.counts.level,{beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'},mine.level)+'</div>':'')+'</div>'}
+  else if(a==='cloud'){h='<div><p class="eyebrow">Nube de palabras</p><h1>'+esc(S.slideTitle||'¿Qué palabra resume esto?')+'</h1><p class="mu">Escribe una palabra y mira la nube del público en vivo.</p></div><div class="card stack"><form id="cloudForm" class="stack"><input class="inp" id="cloudWord" maxlength="24" autocomplete="off" placeholder="una palabra…" value="'+esc(mine.cloud||'')+'"><button class="btn" type="submit">Enviar</button></form><div id="cloudResults" style="margin-top:12px">'+(Object.keys(S.cloud||{}).length?bars(S.cloud,{},mine.cloud):'<p class="mu">Sé el primero en escribir una palabra.</p>')+'</div></div>'}
+  else if(a==='feedback'){h='<div><p class="eyebrow">Tu opinión</p><h1>Cuéntale a David</h1><p class="mu">Comentarios, dudas o sugerencias. Solo David los lee, no se muestran en pantalla.</p></div><div class="card stack"><form id="fbForm" class="stack"><textarea class="inp" id="fbText" maxlength="400" placeholder="Escribe aquí…"></textarea><div class="err" id="fbErr" role="alert"></div><button class="btn" type="submit" id="fbBtn">Enviar comentario</button></form></div>'}
   else if(a==='lobby'&&S.slideTitle){h='<div><p class="eyebrow">'+esc(S.slideLevel||S.event)+'</p><h1>'+esc(S.slideTitle)+'</h1><p class="mu">Sigue la presentación en la pantalla. Aquí aparecerán las próximas dinámicas.</p></div><div class="card"><div class="wait"><i></i><i></i><i></i> En este momento</div></div>'}
   else{h='<div><p class="eyebrow">'+esc(S.event)+'</p><h1>Bienvenido</h1><p class="mu">Deja esta página abierta. Aquí aparecerán las votaciones conforme avance la conferencia.</p></div><div class="card"><div class="wait"><i></i><i></i><i></i> Esperando la siguiente dinámica</div></div><div class="card"><p class="eyebrow">Conectados ahora</p><div class="big">'+S.online+'</div></div>'}
   v.innerHTML=h;
+  v.dataset.act=a;
   v.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const [p,o]=b.dataset.v.split(':');vote(p,o)});
-  v.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go))}
+  v.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go));
+  const cf=$('#cloudForm');if(cf)cf.onsubmit=async e=>{e.preventDefault();const w=$('#cloudWord').value.trim();if(w.length<2)return;mine.cloud=w.toLowerCase().slice(0,24);store.set('cx_votes',mine);try{await api('/api/cloud',{cid,word:w})}catch(err){toast(err.message)}};
+  const ff=$('#fbForm');if(ff)ff.onsubmit=async e=>{e.preventDefault();const t=$('#fbText').value.trim();$('#fbErr').textContent='';if(t.length<5){$('#fbErr').textContent='Escribe un poco m\u00e1s, por favor.';return}$('#fbBtn').disabled=true;
+    try{await api('/api/feedback',{cid,text:t});$('#fbText').value='';toast('\u00a1Gracias! Comentario enviado')}catch(err){$('#fbErr').textContent=err.message}finally{$('#fbBtn').disabled=false}}}
 
 /* Preguntas */
 function renderQ(){const L=$('#qList');if(!S){L.innerHTML='';return}
