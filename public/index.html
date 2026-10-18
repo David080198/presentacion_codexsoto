@@ -202,12 +202,33 @@ function onState(s){S=s;$('#live').classList.add('on');$('#liveTxt').textContent
 function connect(){const es=new EventSource('/events');es.onmessage=e=>{try{onState(JSON.parse(e.data))}catch{}};
   es.onerror=()=>{$('#live').classList.remove('on');$('#liveTxt').textContent='reconectando…'}}
 
-/* Control remoto de presentación (presentador con token) */
-const token=new URLSearchParams(location.search).get('token')||location.hash.slice(1).split('&').find(p=>p.startsWith('token='))?.split('=')[1];
-let hasToken=false;
-async function navigate(cmd,slide){if(!hasToken)return;try{await fetch('/api/navigate',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({command:cmd,slide})})}catch(e){toast(e.message)}}
-function updateSlideControls(){if(!hasToken||!S)return;$('#navControls').classList.add('active');$('#prevBtn').disabled=S.currentSlide<=0;$('#nextBtn').disabled=S.currentSlide>=45;$('#slideInfo').textContent='Slide '+(S.currentSlide+1)+' / 46'}
-if(token&&token.length>10){hasToken=true;document.body.classList.add('has-presenter-token');$('#navControls').classList.add('active');$('#prevBtn').onclick=()=>navigate('prev');$('#nextBtn').onclick=()=>navigate('next')}
+/* Control remoto de presentación (presentador accede a /presentacion) */
+const isPresentador = window.location.pathname === '/presentacion';
+let hasToken = isPresentador;
+async function navigate(cmd, slide) {
+  if (!hasToken) return;
+  try {
+    const token = isPresentador ? 'presenter' : '';
+    await fetch('/api/navigate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+      body: JSON.stringify({ command: cmd, slide })
+    });
+  } catch (e) { toast(e.message); }
+}
+function updateSlideControls() {
+  if (!hasToken || !S) return;
+  $('#navControls').classList.add('active');
+  $('#prevBtn').disabled = S.currentSlide <= 0;
+  $('#nextBtn').disabled = S.currentSlide >= 45;
+  $('#slideInfo').textContent = 'Slide ' + (S.currentSlide + 1) + ' / 46';
+}
+if (isPresentador) {
+  document.body.classList.add('has-presenter-token');
+  $('#navControls').classList.add('active');
+  $('#prevBtn').onclick = () => navigate('prev');
+  $('#nextBtn').onclick = () => navigate('next');
+}
 
 renderLive();
 if(hasToken)updateSlideControls();

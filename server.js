@@ -224,9 +224,16 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
   save(); broadcast();
   res.json({ ok: true });
 });
-app.post('/api/navigate', requireAdmin, (req, res) => {
+app.post('/api/navigate', (req, res) => {
+  // Permitir sin autenticación si no hay ADMIN_TOKEN, o validar token si está configurado
+  if (ADMIN_TOKEN.length >= 12) {
+    const t = String(req.get('x-admin-token') || '');
+    if (!t.length || !crypto.timingSafeEqual(Buffer.from(t), Buffer.from(ADMIN_TOKEN))) {
+      return res.status(401).json({ error: 'Token de administrador inválido.' });
+    }
+  }
   const { command, slide } = req.body || {};
-  const totalSlides = 46; // Actualiza esto si cambias el número de slides en deck.html
+  const totalSlides = 46;
   if (command === 'next' && db.currentSlide < totalSlides - 1) db.currentSlide++;
   else if (command === 'prev' && db.currentSlide > 0) db.currentSlide--;
   else if (command === 'goto' && typeof slide === 'number' && slide >= 0 && slide < totalSlides) db.currentSlide = slide;
@@ -249,6 +256,7 @@ app.get('/api/admin/registrations.csv', requireAdmin, (req, res) => {
 const pub = path.join(__dirname, 'public');
 app.get('/deck', (req, res) => res.sendFile(path.join(pub, 'deck.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(pub, 'admin.html')));
+app.get('/presentacion', (req, res) => res.sendFile(path.join(pub, 'index.html')));
 app.use(express.static(pub, { maxAge: '1h', index: 'index.html' }));
 
 app.listen(PORT, () => console.log(`CodexSoto Live escuchando en :${PORT}`));
