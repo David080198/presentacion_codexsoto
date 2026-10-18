@@ -127,7 +127,7 @@ html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);o
   ];
 
   function fit() {
-    var s = Math.min(window.innerWidth / 2132, window.innerHeight / 1200);
+    var s = Math.min(window.innerWidth / 2132, (window.innerHeight - 150) / 1200);
     stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
   }
   window.addEventListener('resize', fit);
