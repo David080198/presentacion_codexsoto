@@ -77,8 +77,9 @@ nav button{background:none;border:0;padding:14px 4px 13px;font-family:var(--fl);
 nav button[aria-selected="true"]{color:var(--cyan)}
 nav button[aria-selected="true"]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--cyan)}
 nav button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:6px;vertical-align:2px}
-.nav-controls{position:fixed;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(3,6,11,.94);border-top:1px solid var(--line);z-index:9}
+.nav-controls{position:fixed;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(3,6,11,.94);border-top:1px solid var(--line);z-index:11}
 .nav-controls.active{display:flex}
+body.has-presenter-token nav{display:none}
 .nav-controls button{background:rgba(38,224,255,.1);border:1px solid var(--cyan);color:var(--cyan);padding:8px 14px;border-radius:4px;font-family:var(--fm);font-size:13px;cursor:pointer;font-weight:600}
 .nav-controls button:hover{background:rgba(38,224,255,.2)}
 .nav-controls .slide-info{font-family:var(--fm);font-size:12px;color:var(--mute)}
@@ -206,7 +207,7 @@ const token=new URLSearchParams(location.search).get('token')||location.hash.sli
 let hasToken=false;
 async function navigate(cmd,slide){if(!hasToken)return;try{await fetch('/api/navigate',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({command:cmd,slide})})}catch(e){toast(e.message)}}
 function updateSlideControls(){if(!hasToken||!S)return;$('#navControls').classList.add('active');$('#prevBtn').disabled=S.currentSlide<=0;$('#nextBtn').disabled=S.currentSlide>=45;$('#slideInfo').textContent='Slide '+(S.currentSlide+1)+' / 46'}
-if(token&&token.length>10){hasToken=true;$('#navControls').classList.add('active');$('#prevBtn').onclick=()=>navigate('prev');$('#nextBtn').onclick=()=>navigate('next')}
+if(token&&token.length>10){hasToken=true;document.body.classList.add('has-presenter-token');$('#navControls').classList.add('active');$('#prevBtn').onclick=()=>navigate('prev');$('#nextBtn').onclick=()=>navigate('next')}
 
 renderLive();
 if(hasToken)updateSlideControls();
