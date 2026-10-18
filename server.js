@@ -295,6 +295,7 @@ app.get('/api/admin/registrations.csv', requireAdmin, (req, res) => {
 const pub = path.join(__dirname, 'public');
 app.get('/deck', (req, res) => res.sendFile(path.join(pub, 'deck.html')));
 app.get('/deck-pln', (req, res) => res.sendFile(path.join(pub, 'deck-pln.html')));
+app.get('/deck-n8n', (req, res) => res.sendFile(path.join(pub, 'deck-n8n.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(pub, 'admin.html')));
 app.get('/presentacion', (req, res) => res.sendFile(path.join(pub, 'index.html')));
 app.use(express.static(pub, { maxAge: '1h', index: 'index.html' }));

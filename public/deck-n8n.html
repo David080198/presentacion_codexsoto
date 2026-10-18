@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Taller n8n 101 · CodexSoto</title>
+<meta name="description" content="N8N: Automatización de Flujos de Trabajo (Workflows) — presentacion interactiva de CodexSoto">
+<style>
+:root{
+  --bg:#070b14; --panel:#0d1526; --line:#1c3350; --ink:#eef3f8; --mute:#8ea0bb; --dim:#4b5872; --cyan:#22d3ee;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#deck{position:fixed;inset:0;background:var(--bg)}
+#stage{position:absolute;left:50%;top:50%;width:2132px;height:1200px;transform-origin:center center;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.03);background:var(--bg)}
+.slide{position:absolute;inset:0;width:2132px;height:1200px;opacity:0;visibility:hidden;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease,visibility 0s .5s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease,transform .5s ease,visibility 0s;z-index:2}
+.slide img{display:block;width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none}
+
+/* HUD, fijo al viewport (fuera de #stage, no se escala) */
+#hud-top{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.06);z-index:20}
+#hud-top i{display:block;height:100%;width:0%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);transition:width .4s}
+#hud-bottom{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;gap:16px;z-index:20;background:linear-gradient(0deg,rgba(7,11,20,.92),rgba(7,11,20,0))}
+#hud-bottom .side{display:flex;align-items:center;gap:10px}
+.nbtn{font-family:ui-monospace,"JetBrains Mono",monospace;font-size:14px;color:var(--mute);background:rgba(13,21,38,.85);
+  border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer;transition:border-color .2s,color .2s}
+.nbtn:hover{border-color:var(--cyan);color:var(--ink)}
+.nbtn:disabled{opacity:.35;cursor:default}
+#counter{font-family:ui-monospace,"JetBrains Mono",monospace;font-size:13px;color:var(--dim);letter-spacing:.5px}
+#homebtn{text-decoration:none}
+
+/* Indice */
+#idx-overlay{position:fixed;inset:0;background:rgba(5,8,14,.85);backdrop-filter:blur(6px);z-index:30;
+  display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+#idx-overlay.open{opacity:1;visibility:visible;transition:opacity .25s,visibility 0s}
+#idx-panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px;width:min(560px,86vw);
+  max-height:76vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
+#idx-panel h2{font-size:22px;margin:0 0 10px;color:var(--ink)}
+.idx-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;border:1px solid transparent;
+  background:rgba(255,255,255,.02);cursor:pointer;text-align:left;color:var(--ink);font-family:inherit}
+.idx-item:hover{border-color:var(--cyan);background:rgba(34,211,238,.06)}
+.idx-item .n{font-family:ui-monospace,"JetBrains Mono",monospace;color:var(--cyan);font-size:13px;min-width:24px}
+.idx-item b{font-size:15px;font-weight:600}
+#idx-close{align-self:flex-end;background:none;border:none;color:var(--mute);font-size:14px;cursor:pointer;margin-top:6px;font-family:ui-monospace,"JetBrains Mono",monospace}
+
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="hud-top"><i id="progress"></i></div>
+
+<div id="deck">
+  <div id="stage">
+    <div class="slide" id="s01"><img src="assets/deck-n8n/deck-n8n-slide-01.jpg" alt="Portada: N8N, Automatización de Flujos de Trabajo (Workflows)" loading="eager"></div>
+    <div class="slide" id="s02"><img src="assets/deck-n8n/deck-n8n-slide-02.jpg" alt="El Laberinto de las Aplicaciones" loading="lazy"></div>
+    <div class="slide" id="s03"><img src="assets/deck-n8n/deck-n8n-slide-03.jpg" alt="El Orquestador de Flujos de Trabajo" loading="lazy"></div>
+    <div class="slide" id="s04"><img src="assets/deck-n8n/deck-n8n-slide-04.jpg" alt="Control Total: Self-Hosted y Fair-Code" loading="lazy"></div>
+    <div class="slide" id="s05"><img src="assets/deck-n8n/deck-n8n-slide-05.jpg" alt="Diferentes Formas de Construir con LLMs" loading="lazy"></div>
+    <div class="slide" id="s06"><img src="assets/deck-n8n/deck-n8n-slide-06.jpg" alt="El Lenguaje de n8n: Nodos y Flujos" loading="lazy"></div>
+    <div class="slide" id="s07"><img src="assets/deck-n8n/deck-n8n-slide-07.jpg" alt="Demo en Vivo: De Cero a un Flujo Funcional" loading="lazy"></div>
+    <div class="slide" id="s08"><img src="assets/deck-n8n/deck-n8n-slide-08.jpg" alt="¿Qué Puedo Construir con n8n?" loading="lazy"></div>
+    <div class="slide" id="s09"><img src="assets/deck-n8n/deck-n8n-slide-09.jpg" alt="El Ecosistema: Más de 350 Nodos y Creciendo" loading="lazy"></div>
+    <div class="slide" id="s10"><img src="assets/deck-n8n/deck-n8n-slide-10.jpg" alt="n8n en 3 Puntos Clave" loading="lazy"></div>
+    <div class="slide" id="s11"><img src="assets/deck-n8n/deck-n8n-slide-11.jpg" alt="¡Manos a la Obra! Taller Práctico" loading="lazy"></div>
+  </div>
+</div>
+
+<div id="hud-bottom">
+  <div class="side">
+    <a id="homebtn" class="nbtn" href="/">&#8962; Inicio</a>
+    <button class="nbtn" id="idxbtn" title="Indice (tecla I)">&#9776; Indice</button>
+  </div>
+  <div class="side">
+    <span id="counter">01 / 11</span>
+  </div>
+  <div class="side">
+    <button class="nbtn" id="prevbtn">&larr; Anterior</button>
+    <button class="nbtn" id="nextbtn">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<div id="idx-overlay">
+  <div id="idx-panel">
+    <h2>Taller n8n 101</h2>
+    <div id="idx-list"></div>
+    <button id="idx-close">cerrar (esc)</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var current = 0;
+
+  var TITLES = [
+    'Portada',
+    'El Laberinto de las Aplicaciones',
+    'El Orquestador de Flujos de Trabajo',
+    'Control Total: Self-Hosted y Fair-Code',
+    'Formas de Construir con LLMs',
+    'Nodos y Flujos',
+    'Demo en Vivo',
+    '¿Qué Puedo Construir con n8n?',
+    'El Ecosistema: +350 Nodos',
+    'n8n en 3 Puntos Clave',
+    '¡Manos a la Obra!'
+  ];
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 2132, window.innerHeight / 1200);
+    stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  function render() {
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].classList.toggle('active', i === current);
+    }
+    document.getElementById('progress').style.width = (((current + 1) / total) * 100) + '%';
+    var n = String(current + 1).padStart(2, '0');
+    var t = String(total).padStart(2, '0');
+    document.getElementById('counter').textContent = n + ' / ' + t;
+    document.getElementById('prevbtn').disabled = current === 0;
+    document.getElementById('nextbtn').disabled = current === total - 1;
+    history.replaceState(null, '', '#' + slides[current].id);
+  }
+
+  function goTo(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    current = i;
+    render();
+  }
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.getElementById('nextbtn').addEventListener('click', next);
+  document.getElementById('prevbtn').addEventListener('click', prev);
+
+  var idxOverlay = document.getElementById('idx-overlay');
+  var idxList = document.getElementById('idx-list');
+  TITLES.forEach(function(label, idx) {
+    var item = document.createElement('button');
+    item.className = 'idx-item';
+    item.innerHTML = '<span class="n">' + String(idx + 1).padStart(2, '0') + '</span><b></b>';
+    item.querySelector('b').textContent = label;
+    item.addEventListener('click', function() { goTo(idx); closeIdx(); });
+    idxList.appendChild(item);
+  });
+  function openIdx() { idxOverlay.classList.add('open'); }
+  function closeIdx() { idxOverlay.classList.remove('open'); }
+  document.getElementById('idxbtn').addEventListener('click', openIdx);
+  document.getElementById('idx-close').addEventListener('click', closeIdx);
+  idxOverlay.addEventListener('click', function(e) { if (e.target === idxOverlay) closeIdx(); });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    else if (e.key === 'i' || e.key === 'I') { idxOverlay.classList.contains('open') ? closeIdx() : openIdx(); }
+    else if (e.key === 'Escape') { closeIdx(); }
+  });
+
+  var touchX = null;
+  document.addEventListener('touchstart', function(e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    touchX = null;
+  }, { passive: true });
+
+  var startHash = location.hash.replace('#', '');
+  var startIdx = slides.findIndex(function(s) { return s.id === startHash; });
+  current = startIdx >= 0 ? startIdx : 0;
+  render();
+})();
+</script>
+</body>
+</html>
