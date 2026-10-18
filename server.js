@@ -23,12 +23,14 @@ const POLLS = {
   pills: ['blue', 'red'],
   realA: ['h', 'ai'], realB: ['h', 'ai'], realC: ['h', 'ai'], realD: ['h', 'ai'],
   next: ['cambiar', 'transformar', 'ayudar', 'automatizar', 'reemplazar', 'bailar'],
+  reaction: ['👍', '🤔', '😮', '👏', '😴'],
+  rate: ['1', '2', '3', '4', '5'],
 };
-const ACTIVITIES = ['lobby', 'pills', 'real', 'next', 'questions', 'register'];
+const ACTIVITIES = ['lobby', 'pills', 'real', 'next', 'questions', 'register', 'reaction', 'rate'];
 const INTERESTS = ['Agentes de IA', 'Desarrollo web', 'Ciencia de datos', 'Cursos y talleres', 'Proyectos para mi empresa'];
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [], currentSlide: 0 };
+let db = { activity: 'lobby', votes: {}, reveal: {}, questions: [], registrations: [], currentSlide: 0, slideTitle: '', slideLevel: '' };
 try { db = { ...db, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }; } catch { /* primer arranque */ }
 
 let saveTimer = null;
@@ -66,6 +68,7 @@ function publicState() {
     event: EVENT_NAME, activity: db.activity, counts: counts(), reveal: db.reveal,
     questions: visibleQuestions(), online: [...clients].filter((c) => c.role === 'aud').length,
     platformUrl: PLATFORM_URL, privacyUrl: PRIVACY_URL, interests: INTERESTS, currentSlide: db.currentSlide,
+    slideTitle: db.slideTitle, slideLevel: db.slideLevel,
   };
 }
 
@@ -199,7 +202,11 @@ app.get('/api/admin/state', requireAdmin, (req, res) => {
 app.post('/api/admin/activity', requireAdmin, (req, res) => {
   const a = req.body?.activity;
   if (!ACTIVITIES.includes(a)) return res.status(400).json({ error: 'Actividad inválida.' });
-  if (db.activity !== a) { db.activity = a; save(); broadcast(); }
+  const title = typeof req.body?.title === 'string' ? clean(req.body.title, 160) : db.slideTitle;
+  const level = typeof req.body?.level === 'string' ? clean(req.body.level, 80) : db.slideLevel;
+  if (db.activity !== a || db.slideTitle !== title || db.slideLevel !== level) {
+    db.activity = a; db.slideTitle = title; db.slideLevel = level; save(); broadcast();
+  }
   res.json({ ok: true });
 });
 app.post('/api/admin/reveal', requireAdmin, (req, res) => {

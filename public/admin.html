@@ -59,7 +59,7 @@ const qs=new URLSearchParams(location.search);
 let token=qs.get('token')||'';try{if(token)sessionStorage.setItem('cx_tk',token);else token=sessionStorage.getItem('cx_tk')||''}catch{}
 if(qs.get('token'))history.replaceState(null,'','/admin');
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ACTS=[['lobby','Bienvenida'],['pills','Píldoras'],['real','¿Humano o IA?'],['next','Siguiente palabra'],['questions','Preguntas'],['register','Registro']];
+const ACTS=[['lobby','Bienvenida'],['pills','Píldoras'],['real','¿Humano o IA?'],['next','Siguiente palabra'],['reaction','Reacción rápida'],['rate','Encuesta de escala'],['questions','Preguntas'],['register','Registro']];
 async function call(method,url,body){const r=await fetch(url,{method,headers:{'Content-Type':'application/json','x-admin-token':token},body:body?JSON.stringify(body):undefined});if(r.status===401)throw new Error('auth');return r.json()}
 async function load(){try{const s=await call('GET','/api/admin/state');render(s);$('#login').hidden=true;$('#app').hidden=false}catch(e){if(e.message==='auth'){$('#app').hidden=true;$('#login').hidden=false;if(token)$('#le').textContent='Token incorrecto.'}}}
 function render(s){$('#online').textContent=s.online;$('#regs').textContent=s.registrations;

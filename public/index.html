@@ -147,7 +147,7 @@ function setTab(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.se
   $('#view-live').hidden=t!=='live';$('#view-q').hidden=t!=='q';$('#view-r').hidden=t!=='r';if(t==='q')renderQ();window.scrollTo(0,0);markDots()}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 function markDots(){document.querySelectorAll('nav .dot').forEach(d=>d.remove());if(!S)return;
-  const want=S.activity==='questions'?'q':S.activity==='register'?'r':(['pills','real','next'].includes(S.activity)?'live':null);
+  const want=S.activity==='questions'?'q':S.activity==='register'?'r':(['pills','real','next','reaction','rate'].includes(S.activity)?'live':null);
   if(want&&want!==tab){const b=document.querySelector('nav [data-tab="'+want+'"]');const d=document.createElement('span');d.className='dot';b.appendChild(d)}}
 
 /* Vista en vivo */
@@ -156,6 +156,8 @@ const REAL=[['A','En un lugar de la Mancha, de cuyo nombre no quiero acordarme, 
  ['C','Volverán los mensajes sin respuesta\na tu pantalla su luz a encender,\ny otra vez con el dedo en el cristal\ndudando escribirás.','ai','Un LLM imitando a Bécquer'],
  ['D','Volverán las oscuras golondrinas\nen tu balcón sus nidos a colgar,\ny otra vez con el ala a sus cristales\njugando llamarán.','h','Gustavo Adolfo Bécquer, 1871']];
 const NEXT=['cambiar','transformar','ayudar','automatizar','reemplazar','bailar'];
+const REACTIONS=['👍','🤔','😮','👏','😴'];
+const RATES=['1','2','3','4','5'];
 function bars(c,labels,me){const tot=Object.values(c).reduce((a,b)=>a+b,0)||0;return '<div class="bars">'+Object.keys(c).map(k=>{const p=tot?Math.round(c[k]/tot*100):0;return '<div class="bar'+(k===me?' me':'')+'"><span>'+esc(labels[k]||k)+'</span><div class="t"><i style="width:'+p+'%"></i></div><span class="n">'+p+'%</span></div>'}).join('')+'</div><p class="res">'+tot+' votos</p>'}
 async function vote(poll,option){mine[poll]=option;store.set('cx_votes',mine);renderLive();try{await api('/api/vote',{cid,poll,option})}catch(e){toast(e.message)}}
 function renderLive(){const v=$('#view-live');if(!S){v.innerHTML='<div class="card"><div class="wait"><i></i><i></i><i></i> Conectando con la conferencia…</div></div>';return}
@@ -169,6 +171,11 @@ function renderLive(){const v=$('#view-live');if(!S){v.innerHTML='<div class="ca
     NEXT.map(w=>'<button class="opt'+(mine.next===w?' sel':'')+'" data-v="next:'+w+'">'+w+'</button>').join('')+(mine.next?bars(S.counts.next,{},mine.next):'')+'</div>'}
   else if(a==='questions'){h='<div class="card stack"><p class="eyebrow">Ronda de preguntas</p><h2>Es momento de preguntar</h2><button class="btn" data-go="q">Ir a preguntas</button></div>'}
   else if(a==='register'){h='<div class="card stack"><p class="eyebrow">Gracias por venir</p><h2>Regístrate y accede a CodexSoto</h2><p class="mu">Recibe los materiales de la conferencia.</p><button class="btn" data-go="r">Registrarme</button></div>'}
+  else if(a==='reaction'){h='<div><p class="eyebrow">Reacciona</p><h1>'+esc(S.slideTitle||'¿Qué te parece?')+'</h1><p class="mu">Toca el emoji que mejor represente tu reacción.</p></div><div class="card"><div class="pills" style="grid-template-columns:repeat(5,1fr);gap:6px">'+
+    REACTIONS.map(k=>'<button class="pillbtn'+(mine.reaction===k?' sel':'')+'" data-v="reaction:'+k+'" style="padding:12px 2px;gap:4px"><span style="font-size:30px">'+k+'</span></button>').join('')+'</div>'+(mine.reaction?'<div style="margin-top:16px">'+bars(S.counts.reaction,{},mine.reaction)+'</div>':'')+'</div>'}
+  else if(a==='rate'){h='<div><p class="eyebrow">Encuesta rápida</p><h1>'+esc(S.slideTitle||'¿Qué tan claro fue esto?')+'</h1><p class="mu">1 = nada claro · 5 = muy claro</p></div><div class="card"><div class="two" style="grid-template-columns:repeat(5,1fr)">'+
+    RATES.map(n=>'<button class="'+(mine.rate===n?'sel':'')+'" data-v="rate:'+n+'">'+n+'</button>').join('')+'</div>'+(mine.rate?'<div style="margin-top:16px">'+bars(S.counts.rate,{},mine.rate)+'</div>':'')+'</div>'}
+  else if(a==='lobby'&&S.slideTitle){h='<div><p class="eyebrow">'+esc(S.slideLevel||S.event)+'</p><h1>'+esc(S.slideTitle)+'</h1><p class="mu">Sigue la presentación en la pantalla. Aquí aparecerán las próximas dinámicas.</p></div><div class="card"><div class="wait"><i></i><i></i><i></i> En este momento</div></div>'}
   else{h='<div><p class="eyebrow">'+esc(S.event)+'</p><h1>Bienvenido</h1><p class="mu">Deja esta página abierta. Aquí aparecerán las votaciones conforme avance la conferencia.</p></div><div class="card"><div class="wait"><i></i><i></i><i></i> Esperando la siguiente dinámica</div></div><div class="card"><p class="eyebrow">Conectados ahora</p><div class="big">'+S.online+'</div></div>'}
   v.innerHTML=h;
   v.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const [p,o]=b.dataset.v.split(':');vote(p,o)});

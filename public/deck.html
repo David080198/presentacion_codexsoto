@@ -1028,7 +1028,7 @@ function go(n,back=false){
   $('#nBody').textContent=s.dataset.notes||'';
   $('#nSlide').textContent='Lámina '+(cur+1)+' de '+slides.length+(slides[cur+1]?' · sigue: '+(slides[cur+1].dataset.level||''):'');
   try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
-  if(window.__liveSlide)window.__liveSlide(s.id);
+  if(window.__liveSlide){const t=s.querySelector('h1,h2');window.__liveSlide(s.id,{title:t?t.textContent:'',level:s.dataset.level||''})}
   if(H[s.id]&&H[s.id].enter)H[s.id].enter(s,back);
 }
 function next(){const s=slides[cur];if(t0===null)t0=Date.now();
@@ -1433,7 +1433,7 @@ const ACT={'s-join':'lobby','s-pills':'pills','s-real':'real','s-next':'next','s
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let live=false,st=null;
 function post(u,b){if(!live||!token)return;fetch(u,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':token},body:JSON.stringify(b)}).catch(()=>{})}
-window.__liveSlide=id=>{if(ACT[id])post('/api/admin/activity',{activity:ACT[id]})};
+window.__liveSlide=(id,meta)=>post('/api/admin/activity',{activity:ACT[id]||'lobby',title:(meta&&meta.title)||'',level:(meta&&meta.level)||''});
 window.__liveReveal=(poll,on)=>post('/api/admin/reveal',{poll,value:on});
 function qr(el,url,size){el.innerHTML='';try{new QRCode(el,{text:url,width:size,height:size,colorDark:'#03060b',colorLight:'#ffffff'})}catch(e){el.style.display='flex';el.style.alignItems='center';el.style.justifyContent='center';el.innerHTML='<span style="font-family:monospace;color:#03060b;font-size:26px">'+esc(url)+'</span>'}}
 function setup(){const base=live?location.origin:LIVE_URL;qr($('#joinQr'),base,424);$('#joinUrl').textContent=base.replace(/^https?:\/\//,'');
@@ -1452,6 +1452,6 @@ let lastSlide=-1;
 function syncSlide(n){if(typeof n!=='number'||n===lastSlide)return;lastSlide=n;if(window.__goToSlide)window.__goToSlide(n)}
 function connect(){const es=new EventSource('/events?role=deck');es.onmessage=e=>{try{st=JSON.parse(e.data);syncSlide(st.currentSlide);render()}catch(x){}}}
 fetch('/api/state',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(s=>{if(!s||!s.counts)throw 0;live=true;document.documentElement.classList.add('live');st=s;setup();render();syncSlide(st.currentSlide);connect();
-  const a=document.querySelector('.slide.active');if(a)window.__liveSlide(a.id)}).catch(()=>setup());
+  const a=document.querySelector('.slide.active');if(a){const t=a.querySelector('h1,h2');window.__liveSlide(a.id,{title:t?t.textContent:'',level:a.dataset.level||''})}}).catch(()=>setup());
 })();
 </script>
